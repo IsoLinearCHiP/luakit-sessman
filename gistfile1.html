@@ -20,9 +20,11 @@
 
             var sessions = sessionman_get();
             alert(session_list.id);
-            session_list.innerHTML = "test";
-            $("#add-button").click(function() {alert('Add clicked'); session_list.innerHTML = "test2";});
-            alert(session_list.innerHTML)
+            // session_list.innerHTML = "test";
+            $("#session-list").html("test");
+            $("#add-button").click(function() {alert('Add clicked'); $("#session-list").innerHTML = "test2";});
+            alert($("#session-list").html())
+            // alert(document.all.sessionlist.innerHTML)
         })
     </script>
 </head>
