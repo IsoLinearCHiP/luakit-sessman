@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 <head>
@@ -6,30 +7,45 @@
     <style type="text/css">
         {%stylesheet}
     </style>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.1.js"></script>
+    <script type="text/javascript" src="jquery.min.js"></script>
     <!-- dummy API -->
     <script type="text/javascript">
-        function sessionman_get() {
-        	return "hello World!"
-        }
+    function sessionman_get() {
+            return ' [\
+                { "name" : "Session 1", "windows" : {  }, "created" : "", "modified" : "", "sync" : "false"   },\
+                { "name" : "Session 2", "windows" : {  }, "created" : "", "modified" : "", "sync" : "false"   },\
+                { "name" : "Session 3", "windows" : {  }, "created" : "", "modified" : "", "sync" : "false"   }\
+                ]';
+    }
+    </script>
+    <script type="text/javascript">
+        function build_sessionlist(session_array) {
+            var sessions, ul, li;
+            // var sessions = eval('(' + session_array + ')');
+            sessions = jQuery.parseJSON(session_array);
+            ul = document.createElement("ul");
+            for ( i=0; i<sessions.length; i++) {
+                li = document.createElement("li");
+                $(li).html(sessions[i].name);
+                $(ul).append(li);
+            }
+            return ul;
+        };
     </script>
     <script type="text/javascript">
         $(document).ready(function () { 
-        	'use strict';
+            'use strict';
             var session_list = $("#session-list"), window_list = $("#window-list");
 
-            var sessions = sessionman_get();
-            alert(session_list.id);
-            // session_list.innerHTML = "test";
-            $("#session-list").html("test");
+            var sessions = build_sessionlist(sessionman_get());
+            // var sessions = sessionman_get();
+            $("#session-list").html(sessions);
             $("#add-button").click(function() {alert('Add clicked'); $("#session-list").innerHTML = "test2";});
-            alert($("#session-list").html())
-            // alert(document.all.sessionlist.innerHTML)
-        })
+        });
     </script>
 </head>
 <body>
-    <div id="session-list">innerHTML</div>
+    <div id="session-list"><ul id="sessions"></ul></div>
     <div id="window-list" style="position: absolute;"></div>
     <div id="controls" stlye="position: absolute;">
         <input type="button" id="add-button" value="Add" />
