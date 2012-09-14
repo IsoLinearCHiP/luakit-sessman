@@ -73,21 +73,12 @@
             thead = document.createElement("thead");
             tr = document.createElement("tr");
 
-            th = document.createElement("th");
-            $(th).html("Name");
-            $(tr).append(th);
-            th = document.createElement("th");
-            $(th).html("Created");
-            $(tr).append(th);
-            th = document.createElement("th");
-            $(th).html("Modified");
-            $(tr).append(th);
-            th = document.createElement("th");
-            $(th).html("Sync?");
-            $(tr).append(th);
-            th = document.createElement("th");
-            $(th).html("#Windows");
-            $(tr).append(th);
+            //2dwi$($xi)Jdt.$xJdt.f(iTofhrr0w
+            $(document.createElement("th")).html("Name").appendTo(tr);
+            $(document.createElement("th")).html("Created").appendTo(tr);
+            $(document.createElement("th")).html("Modified").appendTo(tr);
+            $(document.createElement("th")).html("Sync?").appendTo(tr);
+            $(document.createElement("th")).html("#Windows").appendTo(tr);
             $(thead).append(tr);
 
             $(tbl).append(thead);
@@ -97,24 +88,15 @@
                 tr = document.createElement("tr");
                 $(tr).attr("sess-id", i);
 
-                td = document.createElement("td");
-                $(td).html(sessions[i].name);
-                $(tr).append(td);
-                td = document.createElement("td");
-                $(td).html(sessions[i].created);
-                $(tr).append(td);
-                td = document.createElement("td");
-                $(td).html(sessions[i].modified);
-                $(tr).append(td);
-                td = document.createElement("td");
-                $(td).html(sessions[i].sync);
-                $(tr).append(td);
-                td = document.createElement("td");
-                $(td).html(sessions[i].windows.length);
-                $(tr).append(td);
+                //2dwi$($xi)Jdt.$xJdt.f(iTofdrr0w
+                $(document.createElement("td")).html(sessions[i].name).appendTo(tr);
+                $(document.createElement("td")).html(sessions[i].created).appendTo(tr);
+                $(document.createElement("td")).html(sessions[i].modified).appendTo(tr);
+                $(document.createElement("td")).html(sessions[i].sync).appendTo(tr);
+                $(document.createElement("td")).html(sessions[i].windows.length).appendTo(tr);
                 $(tbody).append(tr);
-
             }
+
             $(tbl).append(tbody);
             return tbl;
         };
