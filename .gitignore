@@ -1,3 +1,4 @@
 # dont checkin vim temp files please
 .*.sw[op]
+jquery.min.js
 
