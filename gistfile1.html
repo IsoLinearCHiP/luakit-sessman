@@ -1,53 +1,185 @@
-
 <!doctype html>
 <html>
 <head>
     <meta charset="utf-8">
     <title>Sessionmanager</title>
     <style type="text/css">
-        {%stylesheet}
+        /* {%stylesheet} */
+        /* div#session-list ul li.selected {
+            background: #316AC5;
+            color: #FFF;
+        }
+        div#session-list ul li.hover {
+            background: #4198f0;
+            color: #FFF;
+        }
+        div#session-list ul{
+            list-style-type: none;
+        }; */
+        div#session-list table tbody tr.selected {
+            background: #316AC5;
+            color: #FFF;
+        }
+        div#session-list table tbody tr.hover {
+            background: #4198f0;
+            color: #FFF;
+        }
+        div#window-list ul{
+            list-style-type: none;
+        };
     </style>
     <script type="text/javascript" src="jquery.min.js"></script>
     <!-- dummy API -->
     <script type="text/javascript">
-    function sessionman_get() {
+        function sessionman_get() {
             return ' [\
-                { "name" : "Session 1", "windows" : {  }, "created" : "", "modified" : "", "sync" : "false"   },\
-                { "name" : "Session 2", "windows" : {  }, "created" : "", "modified" : "", "sync" : "false"   },\
-                { "name" : "Session 3", "windows" : {  }, "created" : "", "modified" : "", "sync" : "false"   }\
-                ]';
-    }
+                { "name" : "Session 1", "windows" : [\
+                    { "title": "win1, urltitle 1", "url": ""},\
+                    { "title": "win1, urltitle 2", "url": ""},\
+                    { "title": "win1, urltitle 3", "url": ""}\
+                ], "created" : "", "modified" : "", "sync" : "false"},\
+                { "name" : "Session 2", "windows" : [\
+                    { "title": "win2, urltitle 1", "url": ""},\
+                    { "title": "win2, urltitle 2", "url": ""},\
+                    { "title": "win2, urltitle 3", "url": ""}\
+                ], "created" : "", "modified" : "", "sync" : "false"},\
+                { "name" : "Session 3", "windows" : [\
+                    { "title": "win3, urltitle 1", "url": ""},\
+                    { "title": "win3, urltitle 2", "url": ""},\
+                    { "title": "win3, urltitle 3", "url": ""}\
+                ], "created" : "", "modified" : "", "sync" : "false"}\
+            ]';
+        }
     </script>
     <script type="text/javascript">
-        function build_sessionlist(session_array) {
-            var sessions, ul, li;
-            // var sessions = eval('(' + session_array + ')');
-            sessions = jQuery.parseJSON(session_array);
+        // FIXME sessions is global atm, probably not necisarry
+        var sessions;
+
+        function build_sessionlist(sessions) {
+            'use strict';
+            // var ul, li;
+            // ul = document.createElement("ul");
+            // for ( var i=0; i<sessions.length; i++) {
+            //     li = document.createElement("li");
+            //     $(li).html(sessions[i].name);
+            //     $(li).attr("sess-id", i);
+            //     $(ul).append(li);
+            // }
+            // return ul;
+            var tbl, thead, tbody, tr, th, td;
+            tbl = document.createElement("table");
+
+            // setup header
+            thead = document.createElement("thead");
+            tr = document.createElement("tr");
+
+            th = document.createElement("th");
+            $(th).html("Name");
+            $(tr).append(th);
+            th = document.createElement("th");
+            $(th).html("Created");
+            $(tr).append(th);
+            th = document.createElement("th");
+            $(th).html("Modified");
+            $(tr).append(th);
+            th = document.createElement("th");
+            $(th).html("Sync?");
+            $(tr).append(th);
+            th = document.createElement("th");
+            $(th).html("#Windows");
+            $(tr).append(th);
+            $(thead).append(tr);
+
+            $(tbl).append(thead);
+
+            tbody = document.createElement("tbody");
+            for ( var i=0; i<sessions.length; i++) {
+                tr = document.createElement("tr");
+                $(tr).attr("sess-id", i);
+
+                td = document.createElement("td");
+                $(td).html(sessions[i].name);
+                $(tr).append(td);
+                td = document.createElement("td");
+                $(td).html(sessions[i].created);
+                $(tr).append(td);
+                td = document.createElement("td");
+                $(td).html(sessions[i].modified);
+                $(tr).append(td);
+                td = document.createElement("td");
+                $(td).html(sessions[i].sync);
+                $(tr).append(td);
+                td = document.createElement("td");
+                $(td).html(sessions[i].windows.length);
+                $(tr).append(td);
+                $(tbody).append(tr);
+
+            }
+            $(tbl).append(tbody);
+            return tbl;
+        };
+
+        function build_windowlist(windows) {
+            'use strict';
+            var ul, li;
             ul = document.createElement("ul");
-            for ( i=0; i<sessions.length; i++) {
+            for ( var i=0; i<windows.length; i++) {
                 li = document.createElement("li");
-                $(li).html(sessions[i].name);
+                $(li).html(windows[i].title);
+                $(li).attr("win-id", i);
                 $(ul).append(li);
             }
             return ul;
+        };
+
+        function update_windowlist(window_list) {
+            'use strict';
+            var win_html = build_windowlist(window_list);
+            $("#window-list").html(win_html);
+        };
+
+        function update_sessionlist() {
+            'use strict';
+            sessions = jQuery.parseJSON(sessionman_get());
+            var sess_html = build_sessionlist(sessions);
+            $("#session-list").html(sess_html);
+
+            // $('div#session-list ul li').hover(
+            $('div#session-list table tbody tr').hover(
+                function() { $(this).addClass('hover'); },
+                function() { $(this).removeClass('hover'); }
+            ).click(function() {
+                // single select
+                // $("div#session-list ul li.selected").removeClass('selected');
+                $("div#session-list table tbody tr.selected").removeClass('selected');
+                $(this).addClass('selected');
+                // multi select
+                // if ($(this).attr('class').indexOf('selected') > -1) {
+                //     $(this).removeClass('selected');
+                // }
+                // else {
+                //     $(this).addClass('selected');
+                // }
+
+                var sess_id = $(this).attr("sess-id");
+                update_windowlist(sessions[sess_id]["windows"]);
+            });
         };
     </script>
     <script type="text/javascript">
         $(document).ready(function () { 
             'use strict';
-            var session_list = $("#session-list"), window_list = $("#window-list");
+            // var session_list = $("#session-list"), window_list = $("#window-list");
 
-            var sessions = build_sessionlist(sessionman_get());
-            // var sessions = sessionman_get();
-            $("#session-list").html(sessions);
-            $("#add-button").click(function() {alert('Add clicked'); $("#session-list").innerHTML = "test2";});
+            update_sessionlist();
+            $("#add-button").click(function() {alert('Add clicked'); });
         });
     </script>
 </head>
 <body>
     <div id="session-list"><ul id="sessions"></ul></div>
-    <div id="window-list" style="position: absolute;"></div>
-    <div id="controls" stlye="position: absolute;">
+    <div id="window-list"></div>
+    <div id="controls">
         <input type="button" id="add-button" value="Add" />
         <input type="button" id="submit-button" value="Save" />
         <input type="button" id="cancel-button" value="Cancel" />
