@@ -1,0 +1,3 @@
+# dont checkin vim temp files please
+.*.sw[op]
+
