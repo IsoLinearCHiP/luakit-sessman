@@ -61,12 +61,17 @@
             border: 1px solid black;
             overflow: auto;
         }
+        /* styling for the window box */
+        div#controls {
+            width: 80%;
+            vertical-align: middle;
+            margin: 0 auto;
+        }
     </style>
     <script type="text/javascript" src="jquery.min.js"></script>
     <!-- dummy API -->
     <script type="text/javascript">
-        function sessionman_get() {
-            return ' [\
+        var dummy_data = ' [\
                 { "name" : "Session 1", "windows" : [\
                     { "title": "win1, urltitle 1", "url": ""},\
                     { "title": "win1, urltitle 2", "url": ""},\
@@ -83,7 +88,33 @@
                     { "title": "win3, urltitle 3", "url": ""}\
                 ], "created" : "", "modified" : "", "sync" : "false"}\
             ]';
-        }
+
+        // returns the list of sessions stored by luakit
+        function sessionman_get() {
+            'use strict';
+            return dummy_data;
+        };
+
+        // load the selected session into luakit
+        function sessionman_load(sess_num) {
+            'use strict';
+            alert("luakit would now load session " + sess_num);
+            update_sessionlist();
+        };
+
+        // save the currently active session
+        function sessionman_add() {
+            'use strict';
+            alert("luakit would now add the current session.");
+            update_sessionlist();
+        };
+
+        // delete the selected session
+        function sessionman_del(sess_num) {
+            'use strict';
+            alert("luakit would now delete session " + sess_num);
+            update_sessionlist();
+        };
     </script>
     <script type="text/javascript">
         // FIXME sessions is global atm, probably not necisarry
@@ -214,7 +245,9 @@
             // var session_list = $("#session-list"), window_list = $("#window-list");
 
             update_sessionlist();
-            $("#add-button").click(function() {alert('Add clicked'); });
+            $("#select-button").click(function() {sessionman_load($("#session-list tr.selected").attr("data-sess-id"))});
+            $("#add-button").click(function() {sessionman_add();});
+            $("#delete-button").click(function() {sessionman_del($("#session-list tr.selected").attr("data-sess-id"))});
         });
     </script>
 </head>
@@ -222,8 +255,8 @@
     <div id="session-list"><ul id="sessions"></ul></div>
     <div id="window-list"></div>
     <div id="controls">
+        <input type="button" id="select-button" value="Select" />
         <input type="button" id="add-button" value="Add" />
-        <input type="button" id="submit-button" value="Save" />
-        <input type="button" id="cancel-button" value="Cancel" />
+        <input type="button" id="delete-button" value="Delete" />
     </div>
 </body>
