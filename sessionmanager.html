@@ -5,15 +5,54 @@
     <title>Sessionmanager</title>
     <style type="text/css">
         /* {%stylesheet} */
-        div#session-list table tbody tr.selected {
+        * {
+            font-size: 12pt;
+        }
+
+        div#session-list {
+            width: 80%;
+            height: 88pt;
+            vertical-align: middle;
+            margin: 0 auto;
+            border: 1px solid black;
+            margin-bottom: 10px;
+            overflow: auto;
+        }
+        div#session-list>table {
+        	margin: 0;
+        	padding: 0;
+            width: 100%;
+            border-spacing: 0px;
+            line-height: 16pt;
+        }
+        div#session-list>table td {
+        	margin: 0 1px;
+        	padding: 0 1px;
+        }
+        div#session-list>table th {
+        	margin: 0 1px;
+        	padding: 0 1px;
+        }
+        div#session-list>table>tbody>tr.selected {
             background: #316AC5;
             color: #FFF;
         }
-        div#session-list table tbody tr.hover {
-            background: #4198f0;
+        div#session-list>table>tbody>tr.hover {
+            background: #66CCFF;
             color: #FFF;
         }
-        div#window-list ul{
+
+        div#window-list {
+            width: 80%;
+            vertical-align: middle;
+            margin: 0 auto;
+            border: 1px solid black;
+        }
+        div#window-list>table {
+            width: 80%;
+            border: 1px;
+        }
+        div#window-list>ul{
             list-style-type: none;
         };
     </style>
@@ -83,15 +122,42 @@
 
         function build_windowlist(windows) {
             'use strict';
-            var ul, li;
-            ul = document.createElement("ul");
-            for ( var i=0; i<windows.length; i++) {
-                li = document.createElement("li");
-                $(li).html(windows[i].title);
-                $(li).attr("data-win-id", i);
-                $(ul).append(li);
+            var tbl, thead, tbody, tr, th, td;
+            tbl = document.createElement("table");
+
+            // setup header
+            thead = document.createElement("thead");
+            tr = document.createElement("tr");
+
+            $(document.createElement("th")).html("Title").appendTo(tr);
+            $(document.createElement("th")).html("Url").appendTo(tr);
+            $(thead).append(tr);
+
+            $(tbl).append(thead);
+
+            tbody = document.createElement("tbody");
+            for ( var i=0; i<sessions.length; i++) {
+                tr = document.createElement("tr");
+                $(tr).attr("data-sess-id", i);
+
+                $(document.createElement("td")).html(windows[i].title).appendTo(tr);
+                $(document.createElement("td")).html(windows[i].url).appendTo(tr);
+                $(tbody).append(tr);
             }
-            return ul;
+
+            $(tbl).append(tbody);
+            return tbl;
+
+
+            // var ul, li;
+            // ul = document.createElement("ul");
+            // for ( var i=0; i<windows.length; i++) {
+            //     li = document.createElement("li");
+            //     $(li).html(windows[i].title);
+            //     $(li).attr("data-win-id", i);
+            //     $(ul).append(li);
+            // }
+            // return ul;
         };
 
         function update_windowlist(window_list) {
