@@ -5,17 +5,6 @@
     <title>Sessionmanager</title>
     <style type="text/css">
         /* {%stylesheet} */
-        /* div#session-list ul li.selected {
-            background: #316AC5;
-            color: #FFF;
-        }
-        div#session-list ul li.hover {
-            background: #4198f0;
-            color: #FFF;
-        }
-        div#session-list ul{
-            list-style-type: none;
-        }; */
         div#session-list table tbody tr.selected {
             background: #316AC5;
             color: #FFF;
@@ -57,15 +46,6 @@
 
         function build_sessionlist(sessions) {
             'use strict';
-            // var ul, li;
-            // ul = document.createElement("ul");
-            // for ( var i=0; i<sessions.length; i++) {
-            //     li = document.createElement("li");
-            //     $(li).html(sessions[i].name);
-            //     $(li).attr("sess-id", i);
-            //     $(ul).append(li);
-            // }
-            // return ul;
             var tbl, thead, tbody, tr, th, td;
             tbl = document.createElement("table");
 
@@ -86,7 +66,7 @@
             tbody = document.createElement("tbody");
             for ( var i=0; i<sessions.length; i++) {
                 tr = document.createElement("tr");
-                $(tr).attr("sess-id", i);
+                $(tr).attr("data-sess-id", i);
 
                 //2dwi$($xi)Jdt.$xJdt.f(iTofdrr0w
                 $(document.createElement("td")).html(sessions[i].name).appendTo(tr);
@@ -108,7 +88,7 @@
             for ( var i=0; i<windows.length; i++) {
                 li = document.createElement("li");
                 $(li).html(windows[i].title);
-                $(li).attr("win-id", i);
+                $(li).attr("data-win-id", i);
                 $(ul).append(li);
             }
             return ul;
@@ -126,13 +106,11 @@
             var sess_html = build_sessionlist(sessions);
             $("#session-list").html(sess_html);
 
-            // $('div#session-list ul li').hover(
             $('div#session-list table tbody tr').hover(
                 function() { $(this).addClass('hover'); },
                 function() { $(this).removeClass('hover'); }
             ).click(function() {
                 // single select
-                // $("div#session-list ul li.selected").removeClass('selected');
                 $("div#session-list table tbody tr.selected").removeClass('selected');
                 $(this).addClass('selected');
                 // multi select
@@ -143,7 +121,7 @@
                 //     $(this).addClass('selected');
                 // }
 
-                var sess_id = $(this).attr("sess-id");
+                var sess_id = $(this).attr("data-sess-id");
                 update_windowlist(sessions[sess_id]["windows"]);
             });
         };
