@@ -9,52 +9,58 @@
             font-size: 12pt;
         }
 
-        div#session-list {
-            width: 80%;
-            height: 88pt;
-            vertical-align: middle;
-            margin: 0 auto;
-            border: 1px solid black;
-            margin-bottom: 10px;
-            overflow: auto;
-        }
-        div#session-list>table {
+        /* general settings for multicol table */
+        table.multicol {
         	margin: 0;
         	padding: 0;
             width: 100%;
             border-spacing: 0px;
             line-height: 16pt;
         }
-        div#session-list>table td {
+        table.multicol td {
         	margin: 0 1px;
-        	padding: 0 1px;
+        	padding: 0 3px;
         }
-        div#session-list>table th {
+        table.multicol th {
+        	border-left: 1px solid black;
+        	border-right: 1px solid black;
+        	border-bottom: 1px solid black;
+        	border-collapse: collapse;
         	margin: 0 1px;
-        	padding: 0 1px;
+        	padding: 0 3px;
+        	text-align: left;
         }
-        div#session-list>table>tbody>tr.selected {
+
+        /* general settings for selectable table */
+        table.selectable>tbody>tr.selected {
             background: #316AC5;
             color: #FFF;
         }
-        div#session-list>table>tbody>tr.hover {
+        table.selectable>tbody>tr.hover {
             background: #66CCFF;
             color: #FFF;
         }
 
-        div#window-list {
+        /* styling for the session box */
+        div#session-list {
             width: 80%;
+            height: 88pt;
             vertical-align: middle;
             margin: 0 auto;
             border: 1px solid black;
+            overflow: auto;
+            margin-bottom: 10px;
         }
-        div#window-list>table {
+
+        /* styling for the window box */
+        div#window-list {
             width: 80%;
-            border: 1px;
+            height: 88pt;
+            vertical-align: middle;
+            margin: 0 auto;
+            border: 1px solid black;
+            overflow: auto;
         }
-        div#window-list>ul{
-            list-style-type: none;
-        };
     </style>
     <script type="text/javascript" src="jquery.min.js"></script>
     <!-- dummy API -->
@@ -87,6 +93,8 @@
             'use strict';
             var tbl, thead, tbody, tr, th, td;
             tbl = document.createElement("table");
+            $(tbl).addClass("multicol");
+            $(tbl).addClass("selectable");
 
             // setup header
             thead = document.createElement("thead");
@@ -124,6 +132,7 @@
             'use strict';
             var tbl, thead, tbody, tr, th, td;
             tbl = document.createElement("table");
+            $(tbl).addClass("multicol");
 
             // setup header
             thead = document.createElement("thead");
@@ -160,19 +169,9 @@
             // return ul;
         };
 
-        function update_windowlist(window_list) {
-            'use strict';
-            var win_html = build_windowlist(window_list);
-            $("#window-list").html(win_html);
-        };
-
-        function update_sessionlist() {
-            'use strict';
-            sessions = jQuery.parseJSON(sessionman_get());
-            var sess_html = build_sessionlist(sessions);
-            $("#session-list").html(sess_html);
-
-            $('div#session-list table tbody tr').hover(
+        function update_clickhandlers() {
+            // $('div#session-list table tbody tr').hover(
+            $('table.selectable tbody tr').hover(
                 function() { $(this).addClass('hover'); },
                 function() { $(this).removeClass('hover'); }
             ).click(function() {
@@ -190,6 +189,23 @@
                 var sess_id = $(this).attr("data-sess-id");
                 update_windowlist(sessions[sess_id]["windows"]);
             });
+        };
+
+        function update_windowlist(window_list) {
+            'use strict';
+            var win_html = build_windowlist(window_list);
+            $("#window-list").html(win_html);
+        };
+
+        function update_sessionlist() {
+            'use strict';
+            sessions = jQuery.parseJSON(sessionman_get());
+            var sess_html = build_sessionlist(sessions);
+            $("#session-list").html(sess_html);
+
+        	update_clickhandlers();
+            // setup an empty window list, since nothing is selected yet
+            update_windowlist([]);
         };
     </script>
     <script type="text/javascript">
