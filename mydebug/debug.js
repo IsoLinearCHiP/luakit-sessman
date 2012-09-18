@@ -1,3 +1,26 @@
+// sorts a table row
+// table types first, functions last, other than that alphabetically
+function tblrowcmp(a,b) {
+	if        ((a.type == "table") && (b.type != "table")) {
+    	return -1 ; // table allways smaller than other types
+    } else if ((b.type == "table") && (a.type != "table")) {
+    	return 1 ;
+    } else {
+        if        ((a.type == "function") && (b.type != "function")) {
+            return 1 ; // function allways larger than other types
+        } else if ((b.type == "function") && (a.type != "function")) {
+        	return -1 ; 
+        } else  {
+        	if (a.key > b.key) {
+                return 1;
+            } else {
+                return -1;
+            };
+        };
+
+    };
+}
+
 function build_tbllist(tbldata) {
     'use strict';
     var tbl, thead, tbody, tr, th, td;
@@ -50,7 +73,7 @@ function update_clickhandlers() {
 
 function update_tbllist(varname) {
     'use strict';
-    var tbl = jQuery.parseJSON(debug_dir(varname));
+    var tbl = jQuery.parseJSON(debug_dir(varname)).sort(tblrowcmp);
     var tbl_html = build_tbllist(tbl);
     $("#tbl-list").html(tbl_html);
     $("#variable").attr("value", varname)
