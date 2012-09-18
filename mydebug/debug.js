@@ -37,14 +37,14 @@ function update_clickhandlers() {
         function() { $(this).addClass('hover'); },
         function() { $(this).removeClass('hover'); }
     ).click(function() {
-        // single select
-        $("div#session-list table tbody tr.selected").removeClass('selected');
-        $(this).addClass('selected');
-
-        var varname = $("#variable").attr("value");
-        varname += "." + $(this).attr("data-key");
-        $("#variable").attr("value", varname);
-        update_tbllist(varname);
+        var selkey = $(this).attr("data-key");
+        var type = $('tr[data-key="' + selkey + '"] td:last').text();
+        if (type == "table") {
+            var varname = $("#variable").attr("value");
+            varname += "." + selkey;
+            $("#variable").attr("value", varname);
+            update_tbllist(varname);
+        };
     });
 };
 

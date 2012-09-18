@@ -3,17 +3,9 @@ var dummy_data = ' [\
         { "title": "win1, urltitle 1", "url": ""},\
         { "title": "win1, urltitle 2", "url": ""},\
         { "title": "win1, urltitle 3", "url": ""}\
-    ], "type" : "array" },\
-    { "key" : "Key 2", "value" : [\
-        { "title": "win2, urltitle 1", "url": ""},\
-        { "title": "win2, urltitle 2", "url": ""},\
-        { "title": "win2, urltitle 3", "url": ""}\
-    ], "type" : "array" },\
-    { "key" : "Key 3", "value" : [\
-        { "title": "win3, urltitle 1", "url": ""},\
-        { "title": "win3, urltitle 2", "url": ""},\
-        { "title": "win3, urltitle 3", "url": ""}\
-    ], "type" : "array" }\
+    ], "type" : "table" },\
+    { "key" : "Key 2", "value" : "function: 12345678", "type" : "function" },\
+    { "key" : "Key 3", "value" : "foobar", "type" : "string" }\
 ]';
 
 // returns the members of the table specified

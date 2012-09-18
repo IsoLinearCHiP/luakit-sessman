@@ -70,7 +70,11 @@ function dir(x)
     local out = "" 
     for k,v in pairs(tbl) do 
     	if string.len(out) > 0 then out = out .. ",\n" end
-    	out = out .. string.format('{ "key" : "%s", "value" : "%s", "type" : "%s" }', tostring(k), tostring(v), tostring(type(v)))
+    	local strrepr = tostring(v)
+    	-- FIXME: need to check for more 'bad' characters for jsonification, should write a function for json marshaling
+    	strrepr = string.gsub(strrepr, "\n", "\\n")
+    	strrepr = string.gsub(strrepr, '"', '\\"')
+    	out = out .. string.format('{ "key" : "%s", "value" : "%s", "type" : "%s" }', tostring(k), strrepr, tostring(type(v)))
     end
     -- print("[\n" .. out .. "\n]")
     return "[\n" .. out .. "\n]"
