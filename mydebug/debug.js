@@ -53,6 +53,7 @@ function update_tbllist(varname) {
     var tbl = jQuery.parseJSON(debug_dir(varname));
     var tbl_html = build_tbllist(tbl);
     $("#tbl-list").html(tbl_html);
+    $("#variable").attr("value", varname)
 
     update_clickhandlers();
 };
@@ -76,6 +77,13 @@ $(document).ready(function () {
     // var session_list = $("#session-list"), window_list = $("#window-list");
 
     $("#select-button").click(function() {update_tbllist($("#variable").attr("value"))});
+    $("#back-button").click(function() {
+    	var path = $("#variable").attr("value");
+    	var i = path.lastIndexOf(".");
+    	if (i > 0) { path = path.substr(0,i) };
+    	
+    	update_tbllist(path)
+    });
     $(window).resize(onResize);
 
     onResize();
