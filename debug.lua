@@ -13,17 +13,10 @@ local io = io
 local print = print
 local pairs = pairs
 local ipairs = ipairs
-local math = math
 local assert = assert
 local setmetatable = setmetatable
-local rawget = rawget
-local rawset = rawset
 local type = type
-local os = os
-local error = error
-local loadstring = loadstring
 local tostring = tostring
-local GLOBALS = _G
 local _G = _G
 
 -- Grab the luakit environment we need
@@ -40,9 +33,9 @@ local capi = {
 -- Advanced sessionmanager inspired by SessionManager Extension to Firefox
 module("mydebug")
 
--- stylesheet = [===[
--- // this space intentionally left blank
--- ]===]
+stylesheet = [===[
+// this space intentionally left blank
+]===]
 
 
 -- io.input("session_manager.html")
@@ -53,7 +46,7 @@ local html = [==[
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Sessionmanager</title>
+    <title>Debug Introspection</title>
     <style type="text/css">
         /* {%stylesheet} */
         * {
@@ -196,35 +189,15 @@ $(document).ready(function () {
     $("#select-button").click(function() {update_tbllist($("#variable").attr("value"))});
 });
 ]=]
--- var dummy_data = ' [\
---         { "key" : "Key 1", "value" : [\
---             { "title": "win1, urltitle 1", "url": ""},\
---             { "title": "win1, urltitle 2", "url": ""},\
---             { "title": "win1, urltitle 3", "url": ""}\
---         ], "type" : "array" },\
---         { "key" : "Key 2", "value" : [\
---             { "title": "win2, urltitle 1", "url": ""},\
---             { "title": "win2, urltitle 2", "url": ""},\
---             { "title": "win2, urltitle 3", "url": ""}\
---         ], "type" : "array" },\
---         { "key" : "Key 3", "value" : [\
---             { "title": "win3, urltitle 1", "url": ""},\
---             { "title": "win3, urltitle 2", "url": ""},\
---             { "title": "win3, urltitle 3", "url": ""}\
---         ], "type" : "array" }\
---     ]';
+
 function dir(x) 
-    print("dir'ing " .. x .. "\n")
+    -- print("dir'ing " .. x .. "\n")
     local tbl = _G
-    local foo = string.find(x, "[.]") 
-    print(foo)
-    if foo ~= nil then 
+    if string.find(x, "[.]") ~= nil then 
         local path = {}
     	util.string.split(x, '[.]', path)
-        -- print(path)
-        print(table.concat(path, ','))
+        -- print(table.concat(path, ','))
         for _,v in pairs(path) do 
-        	print(v)
         	tbl = tbl[v]
         end
     else
@@ -233,12 +206,10 @@ function dir(x)
 
     local out = "" 
     for k,v in pairs(tbl) do 
-    	-- out = out .. '{ "key" : "' .. tostring(k) .. '", "value" : "' .. tostring(v) .. '", "type" : "' .. 
     	if string.len(out) > 0 then out = out .. ",\n" end
     	out = out .. string.format('{ "key" : "%s", "value" : "%s", "type" : "%s" }', tostring(k), tostring(v), tostring(type(v)))
-    	-- out = out .. tostring(k) .. " : " .. "{ " .. tostring(v) .. " }\n" 
     end
-    print("[\n" .. out .. "\n]")
+    -- print("[\n" .. out .. "\n]")
     return "[\n" .. out .. "\n]"
 end
 
@@ -273,22 +244,17 @@ chrome.add("debug", function (view, meta)
 
     function on_first_visual(_, status)
         -- Wait for new page to be created
-        -- print("debug first visual reached")
         if status ~= "first-visual" then return end
 
         -- Hack to run-once
         view:remove_signal("load-status", on_first_visual)
 
-        -- print("debug checking uri")
         -- Double check that we are where we should be
         if view.uri ~= uri then return end
 
-        -- print("debug exporting funcs")
         -- Double check that we are where we should be
         -- Export luakit JS<->Lua API functions
-        -- print (pairs(export_funcs))
         for name, func in pairs(export_funcs) do
-            -- print(name .. " -> " .. func)
             view:register_function(name, func)
         end
 
