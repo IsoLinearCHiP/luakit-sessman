@@ -56,8 +56,6 @@ function update_tbllist(varname) {
 
     update_clickhandlers();
 };
-</script>
-<script type="text/javascript">
 $(document).ready(function () { 
     'use strict';
     // var session_list = $("#session-list"), window_list = $("#window-list");
