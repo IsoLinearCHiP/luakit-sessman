@@ -56,10 +56,28 @@ function update_tbllist(varname) {
 
     update_clickhandlers();
 };
+
+function cssSizeToNum(csssize) {
+    return parseInt(csssize.substr(0,csssize.length-2));
+};
+
+function onResize() {
+	'use strict';
+
+    var marginheight = cssSizeToNum($("#tbl-list").css("margin-top")) + cssSizeToNum($("#tbl-list").css("margin-bottom"));
+    var borderheight = cssSizeToNum($("#tbl-list").css("border-top-width")) + cssSizeToNum($("#tbl-list").css("border-bottom-width"));
+    var paddingheight = cssSizeToNum($("#container").css("padding-top")) + cssSizeToNum($("#container").css("padding-bottom"));
+    var height = marginheight + borderheight + paddingheight;
+    $("#tbl-list").height($("body").height()-$("#controls").height()-height);
+};
+
 $(document).ready(function () { 
     'use strict';
     // var session_list = $("#session-list"), window_list = $("#window-list");
 
-    update_tbllist("_G");
     $("#select-button").click(function() {update_tbllist($("#variable").attr("value"))});
+    $(window).resize(onResize);
+
+    onResize();
+    update_tbllist("_G");
 });

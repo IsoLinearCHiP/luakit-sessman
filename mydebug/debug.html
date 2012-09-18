@@ -41,27 +41,33 @@
             color: #FFF;
         }
 
-        /* styling for the session box */
+        /* styling for the container box */
+        html { height: 98%; }
+        body {
+            height: 100%;
+            margin 20px auto;
+            /* border: 1px solid black; */
+            /* overflow: auto; */
+        }
+        div#container {
+            height: 100%;
+            border: 1px solid black;
+            overflow: auto;
+        }
+
+        /* styling for the table box */
         div#tbl-list {
             width: 80%;
-            height: 88pt;
+            min-height: 360px;
             vertical-align: middle;
             margin: 0 auto;
             border: 1px solid black;
             overflow: auto;
+            margin-top: 10px;
             margin-bottom: 10px;
         }
 
-        /* styling for the window box */
-        div#window-list {
-            width: 80%;
-            height: 88pt;
-            vertical-align: middle;
-            margin: 0 auto;
-            border: 1px solid black;
-            overflow: auto;
-        }
-        /* styling for the window box */
+        /* styling for controls container */
         div#controls {
             width: 80%;
             vertical-align: middle;
@@ -73,9 +79,11 @@
     <!-- START mainjs --><script type="text/javascript" src="debug.js"></script><!-- END mainjs -->
 </head>
 <body>
-    <div id="tbl-list"><ul id="sessions"></ul></div>
-    <div id="controls">
-        <input type="text" id="variable" value="_G" />
-        <input type="button" id="select-button" value="Select" />
+    <div id="container">
+        <div id="tbl-list"><ul id="sessions"></ul></div>
+        <div id="controls">
+            <input type="text" id="variable" value="_G" />
+            <input type="button" id="select-button" value="Select" />
+        </div>
     </div>
 </body>
