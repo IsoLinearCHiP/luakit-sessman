@@ -18,6 +18,7 @@ local setmetatable = setmetatable
 local type = type
 local tostring = tostring
 local _G = _G
+local debug = debug
 
 -- Grab the luakit environment we need
 local lousy = require("lousy")
@@ -33,6 +34,13 @@ local capi = {
 -- Advanced sessionmanager inspired by SessionManager Extension to Firefox
 module("mydebug")
 
+function getcwd()
+    local path = debug.getinfo(1).short_src
+    local dir,_ = string.gsub(path, "^(.+/)[^/]+$", "%1")
+    return dir
+end
+
+
 stylesheet = [===[
 // this space intentionally left blank
 ]===]
@@ -41,154 +49,9 @@ stylesheet = [===[
 -- io.input("session_manager.html")
 -- local html = io.read("*all")
 
-local html = [==[
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Debug Introspection</title>
-    <style type="text/css">
-        /* {%stylesheet} */
-        * {
-            font-size: 12pt;
-        }
+local html = lousy.load(getcwd() .. "debug.html")
 
-        /* general settings for multicol table */
-        table.multicol {
-        	margin: 0;
-        	padding: 0;
-            width: 100%;
-            border-spacing: 0px;
-            line-height: 16pt;
-        }
-        table.multicol td {
-        	margin: 0 1px;
-        	padding: 0 3px;
-        }
-        table.multicol th {
-        	border-left: 1px solid black;
-        	border-right: 1px solid black;
-        	border-bottom: 1px solid black;
-        	border-collapse: collapse;
-        	margin: 0 1px;
-        	padding: 0 3px;
-        	text-align: left;
-        }
-
-        /* general settings for selectable table */
-        table.selectable>tbody>tr.selected {
-            background: #316AC5;
-            color: #FFF;
-        }
-        table.selectable>tbody>tr.hover {
-            background: #66CCFF;
-            color: #FFF;
-        }
-
-        /* styling for the session box */
-        div#tbl-list {
-            width: 80%;
-            height: 88pt;
-            vertical-align: middle;
-            margin: 0 auto;
-            border: 1px solid black;
-            overflow: auto;
-            margin-bottom: 10px;
-        }
-
-        /* styling for the window box */
-        div#window-list {
-            width: 80%;
-            height: 88pt;
-            vertical-align: middle;
-            margin: 0 auto;
-            border: 1px solid black;
-            overflow: auto;
-        }
-        /* styling for the window box */
-        div#controls {
-            width: 80%;
-            vertical-align: middle;
-            margin: 0 auto;
-        }
-    </style>
-</head>
-<body>
-    <div id="tbl-list"><ul id="sessions"></ul></div>
-    <div id="controls">
-        <input type="text" id="variable" value="_G" />
-        <input type="button" id="select-button" value="Select" />
-    </div>
-</body>
-]==]
-
-local main_js = [=[
-function build_tbllist(tbldata) {
-    'use strict';
-    var tbl, thead, tbody, tr, th, td;
-    tbl = document.createElement("table");
-    $(tbl).addClass("multicol");
-    $(tbl).addClass("selectable");
-
-    // setup header
-    thead = document.createElement("thead");
-    tr = document.createElement("tr");
-
-    $(document.createElement("th")).html("key").appendTo(tr);
-    $(document.createElement("th")).html("value").appendTo(tr);
-    $(document.createElement("th")).html("type").appendTo(tr);
-    $(thead).append(tr);
-
-    $(tbl).append(thead);
-
-    tbody = document.createElement("tbody");
-    for ( var i=0; i<tbldata.length; i++) {
-        tr = document.createElement("tr");
-        $(tr).attr("data-key", tbldata[i].key);
-
-        $(document.createElement("td")).html(tbldata[i].key).appendTo(tr);
-        $(document.createElement("td")).html(tbldata[i].value.toString()).appendTo(tr);
-        $(document.createElement("td")).html(tbldata[i].type).appendTo(tr);
-        $(tbody).append(tr);
-    }
-
-    $(tbl).append(tbody);
-    return tbl;
-};
-
-function update_clickhandlers() {
-    // $('div#session-list table tbody tr').hover(
-    $('table.selectable tbody tr').hover(
-        function() { $(this).addClass('hover'); },
-        function() { $(this).removeClass('hover'); }
-    ).click(function() {
-        // single select
-        $("div#session-list table tbody tr.selected").removeClass('selected');
-        $(this).addClass('selected');
-
-        var varname = $("#variable").attr("value");
-        varname += "." + $(this).attr("data-key");
-        $("#variable").attr("value", varname);
-        update_tbllist(varname);
-    });
-};
-
-function update_tbllist(varname) {
-    'use strict';
-    var tbl = jQuery.parseJSON(debug_dir(varname));
-    var tbl_html = build_tbllist(tbl);
-    $("#tbl-list").html(tbl_html);
-
-    update_clickhandlers();
-};
-$(document).ready(function () { 
-    'use strict';
-    // var session_list = $("#session-list"), window_list = $("#window-list");
-
-    update_tbllist("_G");
-    $("#select-button").click(function() {update_tbllist($("#variable").attr("value"))});
-});
-]=]
+local main_js = lousy.load(getcwd() .. "debug.js")
 
 function dir(x) 
     -- print("dir'ing " .. x .. "\n")
