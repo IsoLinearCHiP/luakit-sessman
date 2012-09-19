@@ -17,6 +17,7 @@ local assert = assert
 local setmetatable = setmetatable
 local type = type
 local tostring = tostring
+local tonumber = tonumber
 local _G = _G
 local debug = debug
 
@@ -53,6 +54,14 @@ local html = lousy.load(getcwd() .. "debug.html")
 
 local main_js = lousy.load(getcwd() .. "debug.js")
 
+function table.repr(tbl)
+    local out = ""
+    for k,v in pairs(tbl) do 
+    	out = out .. k .. " : " .. tostring(v) .. ",\n"
+    end
+    return "{ " .. out .. " }"
+end
+
 function dir(x) 
     -- print("dir'ing " .. x .. "\n")
     local tbl = _G
@@ -61,6 +70,7 @@ function dir(x)
     	util.string.split(x, '[.]', path)
         -- print(table.concat(path, ','))
         for _,v in pairs(path) do 
+        	if tonumber(v) ~= nil then v = tonumber(v) end
         	tbl = tbl[v]
         end
     else
