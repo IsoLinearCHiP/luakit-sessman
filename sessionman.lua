@@ -22,7 +22,6 @@ local os = os
 local error = error
 
 -- Grab the luakit environment we need
-local bookmarks = require("bookmarks")
 local lousy = require("lousy")
 local chrome = require("chrome")
 -- local markdown = require("markdown")
@@ -36,9 +35,6 @@ local capi = {
 
 -- Advanced sessionmanager inspired by SessionManager Extension to Firefox
 module("sessionman")
-
--- Display the bookmark uri and title.
-show_uri = false
 
 stylesheet = [===[
 // this space intentionally left blank
