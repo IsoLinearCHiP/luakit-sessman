@@ -41,41 +41,9 @@ stylesheet = [===[
 ]===]
 
 
-local html = [==[
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Sessionmanager</title>
-    <style type="text/css">
-        {%stylesheet}
-    </style>
-    <!-- <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.1.js"></script> -->
-</head>
-<body>
-    <div id="session-list">innerHTML</div>
-    <div id="window-list" style="position: absolute;"></div>
-    <div id="controls" stlye="position: absolute;">
-        <input type="button" id="add-button" value="Add" />
-        <input type="button" id="submit-button" value="Save" />
-        <input type="button" id="cancel-button" value="Cancel" />
-    </div>
-</body>
-]==]
+local html = lousy.load(getcwd() .. "sessman.html")
 
-local main_js = [=[
-$(document).ready(function () { 'use strict'
-
-    var session_list = $("#session-list"), window_list = $("#window-list");
-
-    var sessions = sessionman_get();
-    alert(sessions);
-    alert(session_list.id);
-    session_list.innerHTML = "test";
-    $("#add-button").click(function() {alert('Add clicked'); session_list.innerHTML = "test2";});
-    alert(session_list.innerHTML)
-})
-]=]
+local main_js = lousy.load(getcwd() .. "sessman.js")
 
 function get() 
     return "Hello World!"
