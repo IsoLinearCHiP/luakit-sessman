@@ -20,6 +20,9 @@ local rawset = rawset
 local type = type
 local os = os
 local error = error
+local window = window
+local tostring = tostring
+local debug = debug
 
 -- Grab the luakit environment we need
 local lousy = require("lousy")
@@ -36,17 +39,167 @@ local capi = {
 -- Advanced sessionmanager inspired by SessionManager Extension to Firefox
 module("sessionman")
 
+function getcwd()
+    local path = debug.getinfo(1).short_src
+    local dir,_ = string.gsub(path, "^(.+/)[^/]+$", "%1")
+    return dir
+end
+
 stylesheet = [===[
 // this space intentionally left blank
 ]===]
-
 
 local html = lousy.load(getcwd() .. "sessman.html")
 
 local main_js = lousy.load(getcwd() .. "sessman.js")
 
-function get() 
-    return "Hello World!"
+Tab = {
+    __index = { uri = "", title = "" },
+
+    __tostring = function(self)
+        -- print("Tab tostring")
+        return "Tab { title: " .. self.title .. " , uri: " .. self.uri .. " }"
+    end,
+
+    new = function(self, o)
+        local o = o or {}
+        setmetatable(o, Tab)
+        -- print("creating new Tab")
+        return o
+    end
+}
+
+Tabs = {
+    __index = function(t, k)
+        t[k] = Tab:new()
+        return t[k]
+    end,
+
+    __tostring = function(self)
+        -- print("Tabs tostring")
+        local tmp = {}
+        for i,s in ipairs(self) do
+            -- print(i, s)
+            table.insert(tmp,tostring(s))
+        end
+        return "[ " .. table.concat(tmp,",") .. " ]"
+    end,
+
+    new = function(self, o)
+        local o = o or {}
+        setmetatable(o, Tabs)
+        -- print("creating new Tabs")
+        return o
+    end
+}
+
+Window = {
+    __index = { currtab = 0, tab = {} },
+    -- FIXME: should init tab in new()
+
+    __tostring = function(self)
+        -- print("Window tostring")
+        return "Window { currtab: " .. self.currtab .. " , tabs: " .. tostring(self.tab) .. " }"
+    end,
+
+    new = function(self, o)
+        local o = o or {}
+        setmetatable(o, Window)
+        -- print("creating new Window")
+        return o
+    end
+}
+
+Windows = {
+    __index = function(t, k)
+        t[k] = Window:new()
+        return t[k]
+    end,
+
+    __tostring = function(self)
+        -- print("Windows tostring")
+        local tmp = {}
+        for i,s in ipairs(self) do
+            -- print(i, s)
+            table.insert(tmp,tostring(s))
+        end
+        return "[ " .. table.concat(tmp,",") .. " ]"
+    end,
+
+    new = function(self, o)
+        local o = o or {}
+        setmetatable(o, Windows)
+        -- print("creating new Windows")
+        return o
+    end
+}
+
+Session = {
+    __index = { name = "", ctime = nil, mtime = nil, win = {}, sync = false },
+    -- FIXME: should init win in new()
+
+    __tostring = function(self)
+        -- print("Session tostring")
+        return "Session { " ..
+               "name: " .. self.name ..
+               " , sync: " .. tostring(self.sync) ..
+               " , ctime: " .. tostring(self.ctime) ..
+               " , mtime: " .. tostring(self.mtime) ..
+               " , win: " .. tostring(self.win) ..
+               " }"
+    end,
+
+    new = function(self, o)
+        local o = o or {}
+        setmetatable(o, Session)
+        -- print("creating new Session")
+        return o
+    end
+}
+
+function get()
+    -- get all active windows
+    local wins = {}
+    for _,w in pairs(window.bywidget) do table.insert(wins, w) end
+
+    -- setup basic info for session
+    local session = Session:new()
+    session.name = "Current"
+    session.ctime = "now"
+    session.mtime = "now"
+    session.win = Windows:new()
+    session.sync = false
+
+    -- iterate over windows and add tabs to session
+    for wi, w in ipairs(wins) do
+        local current = w.tabs:current()
+        -- print(current, wi)
+        -- table.foreach(session.win[wi], print)
+        session.win[wi] = Window:new()
+        session.win[wi].currtab = current
+        session.win[wi].tab = Tabs:new()
+        for ti, tab in ipairs(w.tabs.children) do
+            -- print("adding a new tab: " .. ti)
+            session.win[wi].tab[ti] = Tab:new({uri= tab.uri, title=tab.title})
+            -- session.win[wi].tab[ti].uri=tab.uri
+            -- session.win[wi].tab[ti].title=tab.title
+        end
+        print(session)
+    end
+
+    -- session = {
+    --  [1] = {
+    --      name = "test 1",
+    --      ctime = nil,
+    --      mtime = nil,
+    --         sync = false,
+    --         windows = {
+    --          title = "title 1",
+    --          uri = "http://1"
+    --         }
+    --     }
+    -- }
+    return { [1] = session }
 end
 
 export_funcs = {
@@ -109,13 +262,13 @@ chrome_page = "luakit://sessionman/"
 --         function(w)
 --             w:navigate(chrome_page)
 --         end),
--- 
+--
 --     buf("^gS$", "Open session manager in a new tab.",
 --         function(w)
 --             w:new_tab(chrome_page)
 --         end)
 -- })
--- 
+--
 local cmd = lousy.bind.cmd
 add_cmds({
     cmd("sessionman", function (w)

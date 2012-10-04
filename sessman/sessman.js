@@ -17,7 +17,7 @@ function build_sessionlist(sessions) {
     $(document.createElement("th")).html("Created").appendTo(tr);
     $(document.createElement("th")).html("Modified").appendTo(tr);
     $(document.createElement("th")).html("Sync?").appendTo(tr);
-    $(document.createElement("th")).html("#Windows").appendTo(tr);
+    $(document.createElement("th")).html("#Windows,Tabs").appendTo(tr);
     $(thead).append(tr);
 
     $(tbl).append(thead);
@@ -29,10 +29,14 @@ function build_sessionlist(sessions) {
 
         //2dwi$($xi)Jdt.$xJdt.f(iTofdrr0w
         $(document.createElement("td")).html(sessions[i].name).appendTo(tr);
-        $(document.createElement("td")).html(sessions[i].created).appendTo(tr);
-        $(document.createElement("td")).html(sessions[i].modified).appendTo(tr);
+        $(document.createElement("td")).html(sessions[i].ctime).appendTo(tr);
+        $(document.createElement("td")).html(sessions[i].mtime).appendTo(tr);
         $(document.createElement("td")).html(sessions[i].sync).appendTo(tr);
-        $(document.createElement("td")).html(sessions[i].windows.length).appendTo(tr);
+        // count tabs
+        var tabnum = 0;
+        // alert(JSON.stringify(sessions[i].win[0]))
+        for ( var j=0; j<sessions[i].win.length; j++) { tabnum += sessions[i].win[j].tab.length };
+        $(document.createElement("td")).html("".concat(sessions[i].win.length, ", ", tabnum)).appendTo(tr);
         $(tbody).append(tr);
     }
 
@@ -111,7 +115,8 @@ function update_windowlist(window_list) {
 
 function update_sessionlist() {
     'use strict';
-    sessions = jQuery.parseJSON(sessionman_get());
+    // sessions = jQuery.parseJSON(sessionman_get());
+    sessions = sessionman_get();
     var sess_html = build_sessionlist(sessions);
     $("#session-list").html(sess_html);
 
