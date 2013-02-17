@@ -1,6 +1,6 @@
 -----------------------------------------------------------
 -- implement an interactive session management           --
--- © 2011-2012 0mark@unserver.de, isolin-chip@gmail.com  --
+-- © 2011-2013 0mark@unserver.de, isolin-chip@gmail.com  --
 -----------------------------------------------------------
 
 local os = require "os"
@@ -8,7 +8,7 @@ local webview = webview
 local table = table
 local string = string
 local lousy = require "lousy"
-local capi = { luakit = luakit, sqlite3 = sqlite3 } -- FIXME: not used, necisarry?
+local capi = { luakit = luakit } -- FIXME: not used, necisarry?
 local window = window
 
 module "session_manager"
