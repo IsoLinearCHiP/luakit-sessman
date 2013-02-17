@@ -51,6 +51,10 @@ function getcwd()
     return dir
 end
 
+function basedir() 
+    return os.getenv("XDG_DATA_HOME") or os.getenv("HOME") .. "/.local/share"
+end
+
 ---------------------------------------------
 -- OOP interface to windows tabs and sessions
 ---------------------------------------------
@@ -160,11 +164,18 @@ Session = {
     end,
 
     dump = function(self)
-        return json.encode(self.win)
+        local data = { name = self.name, ctime = self.ctime, mtime = self.mtime, win = self.win, sync = false }
+        return json.encode(data)
     end,
 
     sload = function(self, str)
-        self.win = json.decode(str)
+        local data = json.decode(str)
+        if data then
+            self.name = data.name
+            self.ctime = data.ctime
+            self.mtime = data.mtime
+            self.win = data.win
+        end
         return self.win
     end,
 }
@@ -187,7 +198,8 @@ end
 -- Session functions.
 session = {
     -- The directory where sessions are stored
-    path = "/directory/store/luakit-sessions",
+    -- FIXME: Maybe the storage dir should be considdered a config rather than data
+    path =  basedir() .. "/luakit/sessions/"
 
     -- Save all tabs of current window to session file (if it exists).
     save = function (w, session_data, force)
