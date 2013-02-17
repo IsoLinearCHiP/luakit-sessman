@@ -47,42 +47,26 @@ function build_sessionlist(sessions) {
 function build_windowlist(windows) {
     'use strict';
     var tbl, thead, tbody, tr, th, td;
-    tbl = document.createElement("table");
-    $(tbl).addClass("multicol");
+    var sess, win, tab, li, span;
 
-    // setup header
-    thead = document.createElement("thead");
-    tr = document.createElement("tr");
+    sess = $(document.createElement("ul")).attr("class", "windows");
 
-    $(document.createElement("th")).html("Title").appendTo(tr);
-    $(document.createElement("th")).html("Url").appendTo(tr);
-    $(thead).append(tr);
-
-    $(tbl).append(thead);
-
-    tbody = document.createElement("tbody");
     for ( var i=0; i<windows.length; i++) {
-        tr = document.createElement("tr");
-        $(tr).attr("data-sess-id", i);
+        win = $(document.createElement("ul")).attr("class", "tabs");
 
-        $(document.createElement("td")).html(windows[i].title).appendTo(tr);
-        $(document.createElement("td")).html(windows[i].url).appendTo(tr);
-        $(tbody).append(tr);
+        for ( var j=0; j<windows[i].tab.length; j++) {
+            li = $(document.createElement("li")).attr("class", "tab");
+            $(document.createElement("span")).attr("class", "title").html(windows[i].tab[j].title).appendTo(li);
+            $(document.createElement("span")).attr("class", "uri").html(windows[i].tab[j].uri).appendTo(li);
+            $(li).attr("data-tab-id", j);
+            $(li).appendTo(win);
+        };
+
+        li = $(document.createElement("li")).attr("class", "window").html("Window " + i).append(win);
+        $(li).attr("data-win-id", i).appendTo(sess);
     }
 
-    $(tbl).append(tbody);
-    return tbl;
-
-
-    // var ul, li;
-    // ul = document.createElement("ul");
-    // for ( var i=0; i<windows.length; i++) {
-    //     li = document.createElement("li");
-    //     $(li).html(windows[i].title);
-    //     $(li).attr("data-win-id", i);
-    //     $(ul).append(li);
-    // }
-    // return ul;
+    return sess;
 };
 
 function update_clickhandlers() {
@@ -103,7 +87,7 @@ function update_clickhandlers() {
         // }
 
         var sess_id = $(this).attr("data-sess-id");
-        update_windowlist(sessions[sess_id]["windows"]);
+        update_windowlist(sessions[sess_id]["win"]);
     });
 };
 
