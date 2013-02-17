@@ -1,20 +1,45 @@
-var dummy_data = ' [\
-        { "name" : "Session 1", "windows" : [\
-            { "title": "win1, urltitle 1", "url": ""},\
-            { "title": "win1, urltitle 2", "url": ""},\
-            { "title": "win1, urltitle 3", "url": ""}\
-        ], "created" : "", "modified" : "", "sync" : "false"},\
-        { "name" : "Session 2", "windows" : [\
-            { "title": "win2, urltitle 1", "url": ""},\
-            { "title": "win2, urltitle 2", "url": ""},\
-            { "title": "win2, urltitle 3", "url": ""}\
-        ], "created" : "", "modified" : "", "sync" : "false"},\
-        { "name" : "Session 3", "windows" : [\
-            { "title": "win3, urltitle 1", "url": ""},\
-            { "title": "win3, urltitle 2", "url": ""},\
-            { "title": "win3, urltitle 3", "url": ""}\
-        ], "created" : "", "modified" : "", "sync" : "false"}\
-    ]';
+var dummy_data = [
+        { "id"    : "CURRENT",
+          "name"  : "Current Sessoin",
+          "ctime" : "",
+          "mtime" : "",
+          "sync"  : false,
+          "win"   : [
+              { "currtab" : 1, "tab" : [ 
+                      { title : "win1,tab1", uri : "http://1" },
+                      { title : "win1,tab2", uri : "http://2" },
+                      { title : "win1,tab3", uri : "http://3" },
+              ] },
+              { "currtab" : 2, "tab" : [ 
+                      { title : "win2,tab1", uri : "http://1" },
+                      { title : "win2,tab2", uri : "http://2" },
+              ] },
+          ]
+        },
+        { "id"    : "SomeCrypticHash",
+          "name"  : "A saved session",
+          "ctime" : "2000-01-01 00:00:01",
+          "mtime" : "2012-12-31 23:59:59",
+          "sync"  : false,
+          "win"   : [
+              { "currtab" : 1, "tab" : [ 
+                      { title : "win1,tab1", uri : "http://1" },
+                      { title : "win1,tab2", uri : "http://2" },
+                      { title : "win1,tab3", uri : "http://3" },
+              ] },
+              { "currtab" : 2, "tab" : [ 
+                      { title : "win2,tab1", uri : "http://1" },
+                      { title : "win2,tab2", uri : "http://2" },
+                      { title : "win2,tab3", uri : "http://3" },
+              ] },
+              { "currtab" : 3, "tab" : [ 
+                      { title : "win3,tab1", uri : "http://1" },
+                      { title : "win3,tab2", uri : "http://2" },
+                      { title : "win3,tab3", uri : "http://3" },
+              ] }
+          ]
+        }
+    ];
 
 // returns the list of sessions stored by luakit
 function sessionman_get() {
@@ -23,7 +48,7 @@ function sessionman_get() {
 };
 
 // load the selected session into luakit
-function sessionman_load(sess_num) {
+function sessionman_load(sess_id) {
     'use strict';
     alert("luakit would now load session " + sess_num);
     update_sessionlist();
