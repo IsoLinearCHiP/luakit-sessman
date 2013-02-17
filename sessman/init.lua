@@ -54,7 +54,8 @@ local html = lousy.load(getcwd() .. "sessman.html")
 local main_js = lousy.load(getcwd() .. "sessman.js")
 
 Tab = {
-    __index = { uri = "", title = "" },
+    __index = { uri = "", title = "", hist = {} },
+    -- FIXME: should init hist in new()
 
     __tostring = function(self)
         -- print("Tab tostring")
@@ -180,7 +181,7 @@ function get()
         session.win[wi].tab = Tabs:new()
         for ti, tab in ipairs(w.tabs.children) do
             -- print("adding a new tab: " .. ti)
-            session.win[wi].tab[ti] = Tab:new({uri= tab.uri, title=tab.title})
+            session.win[wi].tab[ti] = Tab:new({uri= tab.uri, title=tab.title, hist=tab.history})
             -- session.win[wi].tab[ti].uri=tab.uri
             -- session.win[wi].tab[ti].title=tab.title
         end
