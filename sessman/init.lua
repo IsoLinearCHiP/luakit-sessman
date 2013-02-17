@@ -28,7 +28,7 @@ local debug = debug
 local lousy = require("lousy")
 local chrome = require("chrome")
 -- local markdown = require("markdown")
-local sql_escape = lousy.util.sql_escape
+-- local sql_escape = lousy.util.sql_escape
 local add_binds = add_binds
 local add_cmds = add_cmds
 local webview = webview
@@ -39,19 +39,19 @@ local capi = {
 -- Advanced sessionmanager inspired by SessionManager Extension to Firefox
 module("sessionman")
 
+--------------------
+-- utility functions
+--------------------
+
 function getcwd()
     local path = debug.getinfo(1).short_src
     local dir,_ = string.gsub(path, "^(.+/)[^/]+$", "%1")
     return dir
 end
 
-stylesheet = [===[
-// this space intentionally left blank
-]===]
-
-local html = lousy.load(getcwd() .. "sessman.html")
-
-local main_js = lousy.load(getcwd() .. "sessman.js")
+---------------------------------------------
+-- OOP interface to windows tabs and sessions
+---------------------------------------------
 
 Tab = {
     __index = { uri = "", title = "", hist = {} },
@@ -132,7 +132,7 @@ Windows = {
         setmetatable(o, Windows)
         -- print("creating new Windows")
         return o
-    end
+    end,
 }
 
 Session = {
@@ -157,6 +157,11 @@ Session = {
         return o
     end
 }
+
+
+-------------------------
+-- JS interface functions
+-------------------------
 
 function get()
     -- get all active windows
@@ -208,6 +213,18 @@ export_funcs = {
     sessionman_get    = _M.get,
     sessionman_remove = remove,
 }
+
+-----------------------------
+-- add chrome interface items
+-----------------------------
+
+stylesheet = [===[
+// this space intentionally left blank
+]===]
+
+local html = lousy.load(getcwd() .. "sessman.html")
+
+local main_js = lousy.load(getcwd() .. "sessman.js")
 
 chrome.add("sessionman", function (view, meta)
     local uri = "luakit://sessionman/"
