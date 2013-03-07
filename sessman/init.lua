@@ -142,7 +142,7 @@ Windows = {
 }
 
 Session = {
-    __index = { name = "", ctime = nil, mtime = nil, win = {}, sync = false },
+    -- __index = { name = "", ctime = nil, mtime = nil, win = {}, sync = false, },
     -- FIXME: should init win in new()
 
     __tostring = function(self)
@@ -157,10 +157,10 @@ Session = {
     end,
 
     new = function(self, o)
-        local o = o or {}
-        setmetatable(o, Session)
+        local def = { name = "", ctime = nil, mtime = nil, win = {}, sync = false, }
+        -- local o = o or {}
         -- print("creating new Session")
-        return o
+        return setmetatable(o or def, Session)
     end,
 
     dump = function(self)
@@ -179,6 +179,7 @@ Session = {
         return self.win
     end,
 }
+Session.__index = Session -- dies ist die "mach mal das OOP heile Zeile"
 
 
 ----------------------------------------
