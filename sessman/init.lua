@@ -77,7 +77,15 @@ Tab = {
         setmetatable(o, Tab)
         -- print("creating new Tab")
         return o
-    end
+    end,
+
+    clone = function(self)
+        local res = Tab:new()
+
+        res.uri   = self.uri
+        res.title = self.title
+        res.hist  = self.hist -- FIXME should prob clone this too
+    end,
 }
 
 Tabs = {
@@ -101,7 +109,15 @@ Tabs = {
         setmetatable(o, Tabs)
         -- print("creating new Tabs")
         return o
-    end
+    end,
+
+    clone = function(self)
+        local res = Tabs:new()
+
+        for ti,t in ipairs(self) do
+            res[ti] = t:clone()
+        end
+    end,
 }
 
 Window = {
@@ -118,7 +134,14 @@ Window = {
         setmetatable(o, Window)
         -- print("creating new Window")
         return o
-    end
+    end,
+
+    clone = function(self)
+        local res = Window:new()
+
+        res.currtab = self.currtab
+        res.tab     = self.tab
+    end,
 }
 
 Windows = {
@@ -142,6 +165,14 @@ Windows = {
         setmetatable(o, Windows)
         -- print("creating new Windows")
         return o
+    end,
+
+    clone = function(self)
+        local res = Windows:new()
+
+        for wi,w in ipairs(self) do
+            res[wi] = w:clone()
+        end
     end,
 }
 
@@ -210,6 +241,15 @@ Session = {
                 -- self.win[wi].tab[ti].title=tab.title
             end
         end
+    end,
+
+    clone = function(self)
+        local res = Session:new()
+
+        res.name  = self.name
+        res.ctime = self.ctime
+        res.mtime = self.mtime
+        res.win   = self.win:clone()
     end,
 }
 Session.__index = Session -- dies ist die "mach mal das OOP heile Zeile"
