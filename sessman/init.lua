@@ -175,10 +175,10 @@ Session = {
     parse = function(self, str)
         local data = json.decode(str)
         if data then
-            self.name = data.name
+            self.name  = data.name
             self.ctime = data.ctime
             self.mtime = data.mtime
-            self.win = data.win
+            self.win   = data.win
         end
         return self.win
     end,
@@ -189,11 +189,11 @@ Session = {
         for _,w in pairs(window.bywidget) do table.insert(wins, w) end
 
         -- setup basic info for session
-        self.name = "Current"
+        self.name  = "Current"
         self.ctime = "now"
         self.mtime = "now"
-        self.win = Windows:new()
-        self.sync = false
+        self.win   = Windows:new()
+        self.sync  = false
 
         -- iterate over windows and add tabs to self
         for wi, w in ipairs(wins) do
@@ -243,7 +243,7 @@ session = {
 
     -- The directory where sessions are stored
     -- FIXME: Maybe the storage dir should be considdered a config rather than data
-    path =  basedir() .. "/luakit/sessions/"
+    path = basedir() .. "/luakit/sessions/",
 
     -- Save all tabs of current window to session file (if it exists).
     save = function (w, session_data, force)
@@ -274,22 +274,31 @@ session = {
                         w:notify("\"" .. name .. "\" [New] written")
                     end
                 end
-            else -- remove session
-                os.remove(file(session.path,name)) -- delete file from system
-                w:warning("\"" .. name .. "\" removed")
             end
         else
             w:error("No session name")
         end
     end,
 
+    -- Read urls from session file.
+    read = function (name)
+        local path = session.path
+        local sfile = file(path,name)
+        if not os.exists(sfile) then return end
+        local fh = io.open(sfile, "r")
+        local sess = Session:new()
+        sess:parse(fh:read("*all"))
+        io.close(fh)
+        return sess
+    end,
+
     -- Write tab data.
-    write = function (name, session, force)
+    write = function (name, sess, force)
         local sfile = file(session.path,name) -- will save to path/name
         local age = os.exists(sfile) and "old" or "new"
         if age == "old" and not force then return false end
         local fh = io.open(sfile, "w")
-        fh:write(session:dump())
+        fh:write(sess:dump())
         io.close(fh)
         return age
     end,
@@ -328,18 +337,6 @@ session = {
         else
             w:error("No session name")
         end
-    end,
-
-    -- Read urls from session file.
-    read = function (name)
-        local path = session.path
-        local sfile = file(path,name)
-        if not os.exists(sfile) then return end
-        local fh = io.open(sfile, "r")
-        local sess = Session:new()
-        sess:sload(fh:read("*all"))
-        io.close(fh)
-        return sess
     end,
 
     -- Open new tabs from table of tab data.
