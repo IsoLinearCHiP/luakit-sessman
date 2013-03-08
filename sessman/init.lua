@@ -354,15 +354,27 @@ session = {
     -- Load new session from file; optionally replace existing session.
     sload = function (w, name, replace)
         if name then
-            local tabs = session.read(name)
-            if tabs then
+            local sess_data = session.read(name)
+            if sess_data then
                 if replace then
+                    -- backup current session first
+                    local curr_sess = Session:new()
+                    curr_sess:copy_curr()
+
                     -- clear tabs from current window
-                    while w.tabs:count() ~= 0 do
-                        w:close_tab(nil, false)
+                    local numwin = #window.bywidget
+                    for _,w in pairs(window.bywidget) do 
+                        if numwin > 1 then
+                            w:close()
+                            numwin = numwin - 1
+                        else
+                            while w.tabs:count() ~= 0 do
+                                w:close_tab(nil, false)
+                            end
+                        end
                     end
                 end
-                session.open(w,tabs)
+                session.open(w,sess_data)
                 if replace then
                     session.setname(w,name,true)
                 end
