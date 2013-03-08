@@ -202,6 +202,16 @@ end
 
 -- Session functions.
 session = {
+    -- functions provided by (old) built-in session handler
+    save = function (wins)
+    end,
+
+    load = function (delete)
+    end,
+
+    restore = function (delete)
+    end,
+
     -- The directory where sessions are stored
     -- FIXME: Maybe the storage dir should be considdered a config rather than data
     path =  basedir() .. "/luakit/sessions/"
