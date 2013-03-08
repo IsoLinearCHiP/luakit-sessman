@@ -286,7 +286,7 @@ session = {
     path = basedir() .. "/luakit/sessions/",
 
     -- Save all tabs of current window to session file (if it exists).
-    save = function (w, session_data, force)
+    store = function (w, session_data, force)
         -- abort if no session_data or empty name
         if not session_data or not session_data.name then return false end
 
