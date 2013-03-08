@@ -19,6 +19,7 @@ local error = error
 local window = window
 local tostring = tostring
 local debug = debug
+local lfs = lfs
 
 -- Grab the luakit environment we need
 local lousy = require("lousy")
@@ -237,6 +238,7 @@ session = {
 -------------------------
 
 function get()
+    local Sessions = {}
     -- setup basic info for session
     -- local sess = Session:new()
     -- print(sess.getmetatable())
@@ -244,6 +246,13 @@ function get()
     -- print(sess)
     -- sess:copy_curr()
     local sess = session.copy_curr()
+    Sessions[1] = sess
+    for sessfile in lfs.dir(session.path) do
+        -- print(sessfile)
+        if not ( sessfile == "." or sessfile == ".." ) then
+            table.insert(Sessions, session.read(sessfile))
+        end
+    end 
 
     -- sess = {
     --  [1] = {
@@ -257,7 +266,7 @@ function get()
     --         }
     --     }
     -- }
-    return { [1] = sess }
+    return Sessions
 end
 
 function add()
