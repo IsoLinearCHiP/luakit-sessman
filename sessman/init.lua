@@ -36,7 +36,11 @@ local capi = {
     luakit = luakit
 }
 
-local json = require("sessman/json")
+-- local json = require("sessman.json")
+-- FIXME: should work?, but doesnt
+require("sessman.json")
+local json = json
+-- does work
 
 -- Advanced sessionmanager inspired by SessionManager Extension to Firefox
 module("sessionman")
