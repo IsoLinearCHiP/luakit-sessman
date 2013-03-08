@@ -392,10 +392,14 @@ session = {
     end,
 
     -- Open new tabs from table of tab data.
-    open = function (w,tabs)
-        if tabs and w then -- load new tabs
-            for _, tab in ipairs(tabs) do
-                w:new_tab(tab[2], tab[1])
+    open = function (w,sess_data)
+        local w = w
+        if sess_data and w then -- load new tabs
+            for _, win in ipairs(sess_data.win) do
+                for _, tab in ipairs(win.tab) do
+                    w:new_tab(tab.url, tab.hist)
+                end
+                w = window.new()
             end
         end
     end,
