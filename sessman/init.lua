@@ -292,32 +292,23 @@ session = {
 
         local name = session_data.name
         if name then
-            -- create a structure, { {if current, history}, ... }
-            local current = w.tabs:current()
-            local tabs = {}
-            for ti, tab in ipairs(w.tabs.children) do
-                table.insert(tabs, { current == ti, tab.history })
-            end
             -- do the saving
-            if #tabs > 0 then
-                if session_name then
-                    if session.write(name,tabs,force) then
-                        w:notify("\"" .. name .. "\" written")
-                        if not w.session then session.setname(w,name,true) end
-                    else
-                        w:error("\"" .. name .. "\" exists in session directory (add ! to override)")
-                    end
+            if #session_data.win > 0 then
+                res = session.write(name,session_data,force)
+                if res == "old" then
+                    w:notify("\"" .. name .. "\" written")
+                elseif res == "new" then
+                    w:notify("\"" .. name .. "\" [New] written")
                 else
-                    if "old" == session.write(name,tabs,true) then
-                        w:notify("\"" .. name .. "\" written")
-                    else
-                        w:notify("\"" .. name .. "\" [New] written")
-                    end
+                    w:error("\"" .. name .. "\" exists in session directory (add ! to override)")
+                    return false
                 end
             end
         else
             w:error("No session name")
+            return false
         end
+        return true
     end,
 
     -- Read urls from session file.
