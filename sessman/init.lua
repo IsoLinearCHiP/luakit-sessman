@@ -209,35 +209,6 @@ Session = {
         return self.win
     end,
 
-    copy_curr = function(self)
-        -- get all active windows
-        local wins = {}
-        for _,w in pairs(window.bywidget) do table.insert(wins, w) end
-
-        -- setup basic info for session
-        self.name  = "Current"
-        self.ctime = "now"
-        self.mtime = "now"
-        self.win   = Windows:new()
-        self.sync  = false
-
-        -- iterate over windows and add tabs to self
-        for wi, w in ipairs(wins) do
-            local current = w.tabs:current()
-            -- print(current, wi)
-            -- table.foreach(self.win[wi], print)
-            self.win[wi] = Window:new()
-            self.win[wi].currtab = current
-            self.win[wi].tab = Tabs:new()
-            for ti, tab in ipairs(w.tabs.children) do
-                -- print("adding a new tab: " .. ti)
-                self.win[wi].tab[ti] = Tab:new({uri= tab.uri, title=tab.title, hist=tab.history})
-                -- self.win[wi].tab[ti].uri=tab.uri
-                -- self.win[wi].tab[ti].title=tab.title
-            end
-        end
-    end,
-
     clone = function(self)
         local res = Session:new()
 
@@ -344,8 +315,8 @@ session = {
             if sess_data then
                 if replace then
                     -- backup current session first
-                    local curr_sess = Session:new()
-                    curr_sess:copy_curr()
+                    -- local curr_sess = Session:new()
+                    local curr_sess = session.copy_curr()
 
                     -- clear tabs from current window
                     local numwin = #window.bywidget
@@ -389,6 +360,39 @@ session = {
             end
         end
     end,
+
+    -- Copy current Session
+    copy_curr = function()
+        local self = Session:new()
+        -- get all active windows
+        local wins = {}
+        for _,w in pairs(window.bywidget) do table.insert(wins, w) end
+
+        -- setup basic info for session
+        self.name  = "Current"
+        self.ctime = "now"
+        self.mtime = "now"
+        self.win   = Windows:new()
+        self.sync  = false
+
+        -- iterate over windows and add tabs to self
+        for wi, w in ipairs(wins) do
+            local current = w.tabs:current()
+            -- print(current, wi)
+            -- table.foreach(self.win[wi], print)
+            self.win[wi] = Window:new()
+            self.win[wi].currtab = current
+            self.win[wi].tab = Tabs:new()
+            for ti, tab in ipairs(w.tabs.children) do
+                -- print("adding a new tab: " .. ti)
+                self.win[wi].tab[ti] = Tab:new({uri= tab.uri, title=tab.title, hist=tab.history})
+                -- self.win[wi].tab[ti].uri=tab.uri
+                -- self.win[wi].tab[ti].title=tab.title
+            end
+        end
+        return self
+    end,
+
 }
 
 -------------------------
@@ -397,12 +401,12 @@ session = {
 
 function get()
     -- setup basic info for session
-    local sess = Session:new()
+    -- local sess = Session:new()
     -- print(sess.getmetatable())
     -- Session.copy_curr(sess)
-    print(sess)
+    -- print(sess)
     -- sess:copy_curr()
-    sess:copy_curr()
+    local sess = session.copy_curr()
 
     -- sess = {
     --  [1] = {
@@ -431,11 +435,11 @@ function add()
         end,
     }
     -- setup basic info for session
-    local sess = Session:new()
+    -- local sess = Session:new()
     -- print(sess.getmetatable())
     -- Session.copy_curr(sess)
     -- sess:copy_curr()
-    sess:copy_curr()
+    local sess = session.copy_curr()
     sess.name = "test"
     print(sess)
 
