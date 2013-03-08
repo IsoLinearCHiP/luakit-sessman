@@ -424,8 +424,31 @@ function get()
     return { [1] = sess }
 end
 
+function add()
+    -- FIXME: crude hack to until i know how to get curr window
+    w = {
+        notify = function(str)
+            print('WARN: ' .. tostring(str))
+        end,
+
+        error = function(str)
+            print('ERR : ' .. tostring(str))
+        end,
+    }
+    -- setup basic info for session
+    local sess = Session:new()
+    -- print(sess.getmetatable())
+    -- Session.copy_curr(sess)
+    -- sess:copy_curr()
+    sess:copy_curr()
+    sess.name = "test"
+    print(sess)
+
+    return session.store(w, sess,false)
+end
+
 export_funcs = {
-    sessionman_add    = add,
+    sessionman_add    = _M.add,
     sessionman_get    = _M.get,
     sessionman_remove = remove,
 }
