@@ -21,7 +21,7 @@ module("sessman.SessData")
 ---------------------------------------------
 
 Tab = {
-    __index = { uri = "", title = "", hist = {} },
+    -- __index = { uri = "", title = "", hist = {} },
     -- FIXME: should init hist in new()
 
     __tostring = function(self)
@@ -30,10 +30,10 @@ Tab = {
     end,
 
     new = function(self, o)
-        local o = o or {}
-        setmetatable(o, Tab)
+        def = { uri = "", title = "", hist = {} }
+        -- local o = o or {}
         -- print("creating new Tab")
-        return o
+        return setmetatable(o or def, Tab)
     end,
 
     clone = function(self)
@@ -78,7 +78,7 @@ Tabs = {
 }
 
 Window = {
-    __index = { currtab = 0, tab = {} },
+    -- __index = { currtab = 0, tab = {} },
     -- FIXME: should init tab in new()
 
     __tostring = function(self)
@@ -87,10 +87,10 @@ Window = {
     end,
 
     new = function(self, o)
-        local o = o or {}
-        setmetatable(o, Window)
+        def = { currtab = 0, tab = Tabs:new() }
+        -- local o = o or {}
         -- print("creating new Window")
-        return o
+        return setmetatable(o or def, Window)
     end,
 
     clone = function(self)
@@ -149,7 +149,7 @@ Session = {
     end,
 
     new = function(self, o)
-        local def = { name = "", ctime = nil, mtime = nil, win = {}, sync = false, }
+        local def = { name = "", ctime = nil, mtime = nil, win = Windows:new(), sync = false, }
         -- local o = o or {}
         -- print("creating new Session")
         return setmetatable(o or def, Session)
