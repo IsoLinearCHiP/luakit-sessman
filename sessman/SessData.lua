@@ -41,6 +41,16 @@ Tab = {
         return setmetatable(o or def, Tab)
     end,
 
+    from_table = function(self, data)
+        local res = Tab:new()
+        if data then
+            res.title = data.title
+            res.uri = data.uri
+            res.hist = data.hist
+        end
+        return res
+    end,
+
     clone = function(self)
         local res = Tab:new()
 
@@ -75,6 +85,16 @@ Tabs = {
         return o
     end,
 
+    from_table = function(self, data)
+        local res = Tabs:new()
+        if data then
+            for ti,t in pairs(data) do 
+                res[ti] = Tab:from_table(t)
+            end
+        end
+        return res
+    end,
+
     clone = function(self)
         local res = Tabs:new()
 
@@ -100,6 +120,15 @@ Window = {
         -- local o = o or {}
         -- print("creating new Window")
         return setmetatable(o or def, Window)
+    end,
+
+    from_table = function(self, data)
+        local res = Window:new()
+        if data then
+            res.currtab = data.currtab
+            res.tab = Tabs:from_table(data.tab)
+        end
+        return res
     end,
 
     clone = function(self)
@@ -133,6 +162,16 @@ Windows = {
         setmetatable(o, Windows)
         -- print("creating new Windows")
         return o
+    end,
+
+    from_table = function(self, data)
+        local res = Windows:new()
+        if data then
+            for wi,w in pairs(data) do
+                res[wi] = Window:from_table(w)
+            end
+        end
+        return res
     end,
 
     clone = function(self)
@@ -171,6 +210,17 @@ Session = {
     dump = function(self)
         local data = { name = self.name, ctime = self.ctime, mtime = self.mtime, win = self.win, sync = false }
         return json.encode(data)
+    end,
+
+    from_table = function(self, data)
+        local res = Session:new()
+        if data then
+            res.name  = data.name
+            res.ctime = data.ctime
+            res.mtime = data.mtime
+            res.win   = Windows:from_table(data.win)
+        end
+        return res
     end,
 
     parse = function(self, str)
