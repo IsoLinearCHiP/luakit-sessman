@@ -154,16 +154,18 @@ session = {
                     -- backup current session first
                     -- local curr_sess = Session:new()
                     local curr_sess = session.copy_curr()
+                    -- FIXME actually store sess to file
 
                     -- clear tabs from current window
-                    local numwin = #window.bywidget
+                    -- FIXME get the length properly # is bogus
+                    local numwin = #window.bywidget + 1
                     for _,w in pairs(window.bywidget) do 
                         if numwin > 1 then
                             w:close()
                             numwin = numwin - 1
                         else
-                            while w.tabs:count() ~= 0 do
-                                w:close_tab(nil, false)
+                            while w.tabs:count() ~= 1 do
+                                w:close_tab(nil, true)
                             end
                         end
                     end
@@ -187,13 +189,13 @@ session = {
 
     -- Open new tabs from table of tab data.
     open = function (w,sess_data)
-        local w = w
         if sess_data and w then -- load new tabs
-            for _, win in ipairs(sess_data.win) do
-                for _, tab in ipairs(win.tab) do
-                    w:new_tab(tab.url, tab.hist)
+            for wi, win in pairs(sess_data.win) do
+                for ti, tab in pairs(win.tab) do
+                    -- print("loading tab with:" .. tab.uri .. tostring(tab.hist))
+                    w:new_tab(tab.hist)
                 end
-                w = window.new()
+                -- w = window.new() -- FIXME handle windows properly
             end
         end
     end,
@@ -370,9 +372,13 @@ chrome_page = "luakit://sessionman/"
 --         end)
 -- })
 --
+currwin = nil
+
 local cmd = lousy.bind.cmd
 add_cmds({
     cmd("sessionman", function (w)
             w:new_tab(chrome_page)
+            -- FIXME a better way to get the current window is needed
+            currwin = w
         end),
 })
