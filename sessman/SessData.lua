@@ -61,7 +61,7 @@ Tabs = {
     __tostring = function(self)
         -- print("Tabs tostring")
         local tmp = {}
-        for i,s in ipairs(self) do
+        for i,s in ipairs(self) do -- FIXME ipairs might be wrong here
             -- print(i, s)
             table.insert(tmp,tostring(s))
         end
@@ -78,7 +78,7 @@ Tabs = {
     clone = function(self)
         local res = Tabs:new()
 
-        for ti,t in ipairs(self) do
+        for ti,t in ipairs(self) do -- FIXME ipairs might be wrong here
             res[ti] = t:clone()
         end
 
@@ -121,7 +121,7 @@ Windows = {
     __tostring = function(self)
         -- print("Windows tostring")
         local tmp = {}
-        for i,s in ipairs(self) do
+        for i,s in ipairs(self) do -- FIXME ipairs might be wrong here
             -- print(i, s)
             table.insert(tmp,tostring(s))
         end
@@ -138,7 +138,7 @@ Windows = {
     clone = function(self)
         local res = Windows:new()
 
-        for wi,w in ipairs(self) do
+        for wi,w in ipairs(self) do -- FIXME ipairs might be wrong here
             res[wi] = w:clone()
         end
 
