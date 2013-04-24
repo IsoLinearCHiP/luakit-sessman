@@ -12,7 +12,9 @@ local debug = debug
 -- local json = require("sessman.json")
 -- FIXME: should work?, but doesnt
 require("sessman.json")
+require("sessman.util")
 local json = json
+local dir = dir
 -- does work
 
 module("sessman.SessData")
@@ -26,7 +28,10 @@ Tab = {
 
     __tostring = function(self)
         -- print("Tab tostring")
-        return "Tab { title: " .. self.title .. " , uri: " .. self.uri .. " }"
+        local title = self.title or "No Title given"
+        local uri = self.uri or "URI missing"
+        return "Tab { title: " .. title .. " , uri: " .. uri .. " , hist: " .. dir(self.hist) .. " }"
+        -- return "Tab { title: " .. self.title .. " , uri: " .. self.uri .. " , hist: " .. dir(self.hist) .. " }"
     end,
 
     new = function(self, o)
@@ -42,6 +47,8 @@ Tab = {
         res.uri   = self.uri
         res.title = self.title
         res.hist  = self.hist -- FIXME should prob clone this too
+
+        return res
     end,
 }
 
@@ -74,6 +81,8 @@ Tabs = {
         for ti,t in ipairs(self) do
             res[ti] = t:clone()
         end
+
+        return res
     end,
 }
 
@@ -97,7 +106,9 @@ Window = {
         local res = Window:new()
 
         res.currtab = self.currtab
-        res.tab     = self.tab
+        res.tab     = self.tab:clone()
+
+        return res
     end,
 }
 
@@ -130,6 +141,8 @@ Windows = {
         for wi,w in ipairs(self) do
             res[wi] = w:clone()
         end
+
+        return res
     end,
 }
 
@@ -178,6 +191,8 @@ Session = {
         res.ctime = self.ctime
         res.mtime = self.mtime
         res.win   = self.win:clone()
+
+        return res
     end,
 }
 Session.__index = Session -- dies ist die "mach mal das OOP heile Zeile"
