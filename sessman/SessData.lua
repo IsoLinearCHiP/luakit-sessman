@@ -225,13 +225,9 @@ Session = {
 
     parse = function(self, str)
         local data = json.decode(str)
-        if data then
-            self.name  = data.name
-            self.ctime = data.ctime
-            self.mtime = data.mtime
-            self.win   = Windows:new(data.win)
-        end
-        return self
+        res = Session:from_table(data)
+        print(res)
+        return res
     end,
 
     clone = function(self)

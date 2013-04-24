@@ -121,8 +121,7 @@ session = {
         local sfile = file(path,name)
         if not os.exists(sfile) then return end
         local fh = io.open(sfile, "r")
-        local sess = Session:new()
-        sess:parse(fh:read("*all"))
+        local sess = Session:parse(fh:read("*all"))
         io.close(fh)
         return sess
     end,
