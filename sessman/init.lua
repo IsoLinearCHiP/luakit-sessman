@@ -382,4 +382,17 @@ add_cmds({
             -- FIXME a better way to get the current window is needed
             currwin = w
         end),
+    cmd("loadsess", function (w,a,o)
+            name = a
+            print("loadsess cmd, arg=" .. a)
+            session.sload(w, name, not o.bang)
+        end),
+    cmd("savesess", function (w,a,o)
+            sessname = a
+            local sess = session.copy_curr()
+            sess.name = sessname
+
+            print("savesess cmd, arg=" .. a)
+            session.store(w, sess, not o.bang)
+        end),
 })
