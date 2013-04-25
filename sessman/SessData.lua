@@ -1,3 +1,7 @@
+---------------------------------------------------------------------------
+-- @author IsoLinearCHiP <isolin.chip@gmail.com>
+---------------------------------------------------------------------------
+
 local table = table
 local string = string
 local io = io
@@ -23,9 +27,6 @@ module("sessman.SessData")
 ---------------------------------------------
 
 Tab = {
-    -- __index = { uri = "", title = "", hist = {} },
-    -- FIXME: should init hist in new()
-
     __tostring = function(self)
         -- print("Tab tostring")
         local title = self.title or "No Title given"
@@ -107,9 +108,6 @@ Tabs = {
 }
 
 Window = {
-    -- __index = { currtab = 0, tab = {} },
-    -- FIXME: should init tab in new()
-
     __tostring = function(self)
         -- print("Window tostring")
         return "Window { currtab: " .. self.currtab .. " , tabs: " .. tostring(self.tab) .. " }"
@@ -186,9 +184,6 @@ Windows = {
 }
 
 Session = {
-    -- __index = { name = "", ctime = nil, mtime = nil, win = {}, sync = false, },
-    -- FIXME: should init win in new()
-
     __tostring = function(self)
         -- print("Session tostring")
         return "Session { " ..

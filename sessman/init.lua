@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------
--- @author IsoLinearCHiP &lt;isolin.chip@gmail.com&gt;
+-- @author IsoLinearCHiP <isolin.chip@gmail.com>
 ---------------------------------------------------------------------------
 
 -- Grab environment we need
@@ -76,6 +76,7 @@ end
 -- Session functions.
 session = {
     -- functions provided by (old) built-in session handler
+    -- FIXME: implement an emulation of built-in session handler
     save = function (wins)
     end,
 
@@ -152,7 +153,6 @@ session = {
             if sess_data then
                 if replace then
                     -- backup current session first
-                    -- local curr_sess = Session:new()
                     local curr_sess = session.copy_curr()
                     -- FIXME actually store sess to file
 
@@ -189,13 +189,13 @@ session = {
 
     -- Open new tabs from table of tab data.
     open = function (w,sess_data)
+        -- local w = w
         if sess_data and w then -- load new tabs
             for wi, win in pairs(sess_data.win) do
                 for ti, tab in pairs(win.tab) do
                     -- print("loading tab with:" .. tab.uri .. tostring(tab.hist))
                     w:new_tab(tab.hist)
                 end
-                -- w = window.new() -- FIXME handle windows properly
             end
         end
     end,
@@ -217,16 +217,11 @@ session = {
         -- iterate over windows and add tabs to self
         for wi, w in ipairs(wins) do
             local current = w.tabs:current()
-            -- print(current, wi)
-            -- table.foreach(self.win[wi], print)
             self.win[wi] = Window:new()
             self.win[wi].currtab = current
             self.win[wi].tab = Tabs:new()
             for ti, tab in ipairs(w.tabs.children) do
-                -- print("adding a new tab: " .. ti)
                 self.win[wi].tab[ti] = Tab:new({uri= tab.uri, title=tab.title, hist=tab.history})
-                -- self.win[wi].tab[ti].uri=tab.uri
-                -- self.win[wi].tab[ti].title=tab.title
             end
         end
         return self
@@ -240,54 +235,30 @@ session = {
 
 function get()
     local Sessions = {}
-    -- setup basic info for session
-    -- local sess = Session:new()
-    -- print(sess.getmetatable())
-    -- Session.copy_curr(sess)
-    -- print(sess)
-    -- sess:copy_curr()
-    local sess = session.copy_curr()
-    Sessions[1] = sess
+    Sessions[1] = session.copy_curr()
     for sessfile in lfs.dir(session.path) do
-        -- print(sessfile)
         if not ( sessfile == "." or sessfile == ".." ) then
             table.insert(Sessions, session.read(sessfile))
         end
     end 
 
-    -- sess = {
-    --  [1] = {
-    --      name = "test 1",
-    --      ctime = nil,
-    --      mtime = nil,
-    --         sync = false,
-    --         windows = {
-    --          title = "title 1",
-    --          uri = "http://1"
-    --         }
-    --     }
-    -- }
     return Sessions
 end
 
 function add(sessname)
     w = currwin
-    if not sessname then sessname="test" end
+    -- FIXME: call it autosave and append a date or something
+    if not sessname then sessname="test" end 
 
-    -- setup basic info for session
-    -- local sess = Session:new()
-    -- print(sess.getmetatable())
-    -- Session.copy_curr(sess)
-    -- sess:copy_curr()
     local sess = session.copy_curr()
     sess.name = sessname
-    print(sess)
 
     return session.store(w, sess,false)
 end
 
 function loads(sessname)
     w = currwin
+    -- FIXME: error handling when sessname not set
     if not sessname then sessname="test" end
 
     return session.sload(w, sessname,false)
@@ -297,7 +268,8 @@ export_funcs = {
     sessionman_add    = _M.add,
     sessionman_get    = _M.get,
     sessionman_load    = _M.loads,
-    sessionman_remove = remove,
+    -- FIXME: implement a delete session operation
+    -- sessionman_remove = remove,
 }
 
 -----------------------------
@@ -317,10 +289,6 @@ chrome.add("sessionman", function (view, meta)
 
     -- local style = chrome.stylesheet .. _M.stylesheet
     local style = ""
-
-    if not _M.show_uri then
-        style = style .. " .bookmark .uri { display: none !important; } "
-    end
 
     local html = string.gsub(html, "{%%(%w+)}", { stylesheet = style })
 
@@ -360,20 +328,28 @@ end)
 
 chrome_page = "luakit://sessionman/"
 
--- local key, buf = lousy.bind.key, lousy.bind.buf
--- add_binds("normal", {
+--------------------
+-- Key Bindings
+--------------------
+
+local key, buf = lousy.bind.key, lousy.bind.buf
+add_binds("normal", {
 --     buf("^gs$", "Open session manager in the current tab.",
 --         function(w)
 --             w:navigate(chrome_page)
 --         end),
 --
---     buf("^gS$", "Open session manager in a new tab.",
---         function(w)
---             w:new_tab(chrome_page)
---         end)
--- })
---
+    buf("^gS$", "Open session manager in a new tab.",
+        function(w)
+            w:new_tab(chrome_page)
+        end)
+})
+
 currwin = nil
+
+--------------------
+-- Commands
+--------------------
 
 local cmd = lousy.bind.cmd
 add_cmds({
