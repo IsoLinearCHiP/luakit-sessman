@@ -270,32 +270,33 @@ function get()
     return Sessions
 end
 
-function add()
-    -- FIXME: crude hack to until i know how to get curr window
-    w = {
-        notify = function(str)
-            print('WARN: ' .. tostring(str))
-        end,
+function add(sessname)
+    w = currwin
+    if not sessname then sessname="test" end
 
-        error = function(str)
-            print('ERR : ' .. tostring(str))
-        end,
-    }
     -- setup basic info for session
     -- local sess = Session:new()
     -- print(sess.getmetatable())
     -- Session.copy_curr(sess)
     -- sess:copy_curr()
     local sess = session.copy_curr()
-    sess.name = "test"
+    sess.name = sessname
     print(sess)
 
     return session.store(w, sess,false)
 end
 
+function loads(sessname)
+    w = currwin
+    if not sessname then sessname="test" end
+
+    return session.sload(w, sessname,false)
+end
+
 export_funcs = {
     sessionman_add    = _M.add,
     sessionman_get    = _M.get,
+    sessionman_load    = _M.loads,
     sessionman_remove = remove,
 }
 
