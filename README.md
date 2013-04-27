@@ -36,6 +36,6 @@ Deleting sessions is currently not implemented yet, just use standard file opera
 
 Attributions:
 =============
-    * sess_saver.lua : http://sprunge.us/KYDc, from user joggle in #luakit
-    * json.lua : https://github.com/craigmj/json4lua/raw/master/json4lua/json/json.lua
-    * luaunit: https://github.com/luaforge/luaunit/blob/master/luaunit.lua
+* sess_saver.lua : http://sprunge.us/KYDc, from user joggle in #luakit
+* json.lua : https://github.com/craigmj/json4lua/raw/master/json4lua/json/json.lua
+* luaunit: https://github.com/luaforge/luaunit/blob/master/luaunit.lua
