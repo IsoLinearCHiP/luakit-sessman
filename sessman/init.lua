@@ -93,7 +93,7 @@ session = {
     -- Save all tabs of current window to session file (if it exists).
     store = function (w, session_data, force)
         -- abort if no session_data or empty name
-        if not session_data or not session_data.name then return false end
+        if not session_data or not session_data.name then w:error('Error in Sessiondata') return false end
 
         local name = session_data.name
         if name then
@@ -133,7 +133,11 @@ session = {
         local age = os.exists(sfile) and "old" or "new"
         if age == "old" and not force then return false end
         local fh = io.open(sfile, "w")
-        fh:write(sess:dump())
+        if fh then 
+            fh:write(sess:dump())
+        else
+            return false
+        end
         io.close(fh)
         return age
     end,
@@ -209,8 +213,9 @@ session = {
 
         -- setup basic info for session
         self.name  = "Current"
-        self.ctime = "now"
-        self.mtime = "now"
+        
+        self.ctime = os.date('%y%m%d_%H%M')
+        self.mtime = os.date('%y%m%d_%H%M')
         self.win   = Windows:new()
         self.sync  = false
 
@@ -245,21 +250,20 @@ function get()
     return Sessions
 end
 
-function add(sessname)
+function add(sessname, overwrite)
     w = currwin
-    -- FIXME: call it autosave and append a date or something
-    if not sessname then sessname="test" end 
+    if ((not sessname) or sessname == "") then sessname=os.date('autosave_%y%m%d_%H%M') end 
 
     local sess = session.copy_curr()
     sess.name = sessname
 
-    return session.store(w, sess,false)
+    return session.store(w, sess,overwrite or false)
 end
 
 function loads(sessname)
     w = currwin
     -- FIXME: error handling when sessname not set
-    if not sessname then sessname="test" end
+    if not sessname then w:error('No Sessionname specified.') return false end
 
     return session.sload(w, sessname,false)
 end
@@ -359,16 +363,15 @@ add_cmds({
             currwin = w
         end),
     cmd("loadsess", function (w,a,o)
+            currwin = w
+
             name = a
-            print("loadsess cmd, arg=" .. a)
             session.sload(w, name, not o.bang)
         end),
     cmd("savesess", function (w,a,o)
-            sessname = a
-            local sess = session.copy_curr()
-            sess.name = sessname
+            currwin = w
 
-            print("savesess cmd, arg=" .. a)
-            session.store(w, sess, not o.bang)
+            sessname = a or ""
+            add(sessname, not o.bang)
         end),
 })
