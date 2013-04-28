@@ -378,3 +378,110 @@ add_cmds({
             add(sessname, not o.bang)
         end),
 })
+
+-- FIXME: add interactive list for sessionnames
+-- Add mode to display all sessions in an interactive menu.
+-- new_mode("sessionlist", {
+--     enter = function (w)
+--         -- Build session list
+--         local rows = {{ "Name", "Created", "Modified", "Win/Tabs", "Sync", title = true }}
+--         for _, s in ipairs(sessions) do
+--             local function name()
+--                 return "THE SESSIONNAME"
+--             end
+--             local function ctime()
+--                 return "THE CTIME"
+--             end
+--             local function mtime()
+--                 return "THE MTIME"
+--             end
+--             local function tabcount()
+--                 return "THE TABCOUNT"
+--             end
+--             local function sync()
+--                 return "THE SYNCSTATE"
+--             end
+--             table.insert(rows, { name, ctime, mtime, tabcount, sync, sess = s })
+--         end
+--         w.menu:build(rows)
+--         w:notify("Use j/k to move, o/ENT open, d delete, r rename", false)
+-- 
+--         -- Update menu every second
+--         local update_timer = capi.timer{interval=1000}
+--         update_timer:add_signal("timeout", function ()
+--             w.menu:update()
+--         end)
+--         w.session_menu_state = { update_timer = update_timer }
+--         update_timer:start()
+--     end,
+-- 
+--     leave = function (w)
+--         local ds = w.session_menu_state
+--         if ds and ds.update_timer.started then
+--             ds.update_timer:stop()
+--         end
+--         w.menu:hide()
+--     end,
+-- })
+-- 
+-- -- Add additional binds to session menu mode.
+-- local key = lousy.bind.key
+-- add_binds("sessionlist", lousy.util.table.join({
+--     -- Delete session
+--     key({}, "d", function (w)
+--         local row = w.menu:get()
+--         if row and row.dl then
+--             -- FIXME: delete the session
+--         end
+--     end),
+-- 
+--     -- Open session
+--     key({}, "o", function (w)
+--         local row = w.menu:get()
+--         if row and row.dl then
+--             -- FIXME: open the session
+--         end
+--     end),
+-- 
+--     -- Rename session
+--     key({}, "r", function (w)
+--         local row = w.menu:get()
+--         if row and row.dl then
+--             -- FIXME: rename the session
+--         end
+--         -- HACK: Bad way of refreshing session list to show new items
+--         -- (I.e. the new session after the rename)
+--         w:set_mode("downloadlist")
+--     end),
+-- 
+--     -- Exit menu
+--     key({}, "q", function (w) w:set_mode() end),
+-- 
+-- }, menu_binds))
+
+
+-- FIXME: shutdown interuption if session not saved?
+-- capi.luakit.add_signal("can-close", function ()
+--     return "reason not to shutdown"
+-- end)
+
+-- FIXME: Add some visual feedback to the statusbar?
+-- like sessionname / saved status of the session
+-- window.init_funcs.session_status = function (w)
+--     local r = w.sbar.r
+--     r.session = capi.widget{type="label"}
+--     r.layout:pack(r.session)
+--     r.layout:reorder(r.session, 1)
+--     -- Apply theme
+--     local theme = lousy.theme.get()
+--     r.session.fg = theme.session_sbar_fg
+--     r.session.font = theme.session_sbar_font
+-- end
+-- 
+-- local status_timer = capi.timer{interval=1000}
+-- status_timer:add_signal("timeout", function ()
+--     -- if I want to stop the visual update...
+--     if something then status_timer:stop() end
+-- 
+--     _M.emit_signal("status-tick", SOMEINFO)
+-- end)
