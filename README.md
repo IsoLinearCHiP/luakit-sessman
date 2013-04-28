@@ -16,7 +16,7 @@ cd ~/soft
 Then clone the repository and create a symlink to your luakit config folder.
 
 ```bash
-git clone git://github.com/IsoLinearCHiP/luakit-sessman.git; ln -s luakit-sessman/sessman ~/.config/luakit/sessman
+git clone git://github.com/IsoLinearCHiP/luakit-sessman.git; ln -s `pwd`/luakit-sessman/sessman ~/.config/luakit/sessman
 ```
 
 Next edit your ~/.config/luakit/rc.lua file and add ```require "sessman"``` in the "Optional user script loading" section
