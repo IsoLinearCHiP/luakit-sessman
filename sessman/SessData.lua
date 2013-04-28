@@ -221,7 +221,6 @@ Session = {
     parse = function(self, str)
         local data = json.decode(str)
         res = Session:from_table(data)
-        print(res)
         return res
     end,
 

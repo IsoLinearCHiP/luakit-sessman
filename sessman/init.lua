@@ -129,6 +129,9 @@ session = {
 
     -- Write tab data.
     write = function (name, sess, force)
+        -- FIXME: sanitize Name
+        assert(string.find(name, "/") == nil, "Session name may not contain '/'")
+        -- FIXME: create sessiondir if not existant
         local sfile = file(session.path,name) -- will save to path/name
         local age = os.exists(sfile) and "old" or "new"
         if age == "old" and not force then return false end
