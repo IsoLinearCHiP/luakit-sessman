@@ -207,6 +207,18 @@ session = {
         end
     end,
 
+    -- load sessions from sessionpath
+    get_sessions = function ()
+        local Sessions = {}
+        for sessfile in lfs.dir(session.path) do
+            if not ( sessfile == "." or sessfile == ".." ) then
+                table.insert(Sessions, session.read(sessfile))
+            end
+        end 
+
+        return Sessions
+    end,
+
     -- Copy current Session
     copy_curr = function()
         local self = Session:new()
@@ -242,13 +254,8 @@ session = {
 -------------------------
 
 function get()
-    local Sessions = {}
-    Sessions[1] = session.copy_curr()
-    for sessfile in lfs.dir(session.path) do
-        if not ( sessfile == "." or sessfile == ".." ) then
-            table.insert(Sessions, session.read(sessfile))
-        end
-    end 
+    local Sessions = session.get_sessions()
+    table.insert(Sessions, 1, session.copy_curr())
 
     return Sessions
 end
