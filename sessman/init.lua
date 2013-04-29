@@ -212,11 +212,15 @@ session = {
     end,
 
     -- load sessions from sessionpath
-    get_sessions = function ()
+    get_sessions = function (sessname)
         local Sessions = {}
+        local sessname = sessname or ""
         for sessfile in lfs.dir(session.path) do
             if not ( sessfile == "." or sessfile == ".." ) then
-                table.insert(Sessions, session.read(sessfile))
+                sess = session.read(sessfile)
+                if string.match(sess.name, sessname) then 
+                    table.insert(Sessions, sess)
+                end
             end
         end 
 
