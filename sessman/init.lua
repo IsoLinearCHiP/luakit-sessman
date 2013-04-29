@@ -401,31 +401,39 @@ add_cmds({
 
 -- FIXME: add interactive list for sessionnames
 -- Add mode to display all sessions in an interactive menu.
+function build_sessmenu(sessname,left)
+    local sessions = session.get_sessions(sessname)
+    local left = left or ""
+    -- Build session list
+    local rows = {{ "", "Name", "Created", "Modified", "Win/Tabs", "Sync", title = true }}
+    for _, s in ipairs(sessions) do
+        local function name()
+            return s.name
+        end
+        local function ctime()
+            return s.ctime
+        end
+        local function mtime()
+            return s.mtime
+        end
+        local function tabcount()
+            tabcount = 0
+            for _,wi in ipairs(s.win) do tabcount = tabcount + #wi.tab end
+            return #s.win .. "/" .. tabcount
+        end
+        local function sync()
+            return tostring(s.sync)
+        end
+        table.insert(rows, { "", name, ctime, mtime, tabcount, sync, sess = s, left = left .. name() })
+    end
+    
+    return rows
+end
+
 new_mode("sessionlist", {
     enter = function (w)
-        local sessions = session.get_sessions()
         -- Build session list
-        local rows = {{ "", "Name", "Created", "Modified", "Win/Tabs", "Sync", title = true }}
-        for _, s in ipairs(sessions) do
-            local function name()
-                return s.name
-            end
-            local function ctime()
-                return s.ctime
-            end
-            local function mtime()
-                return s.mtime
-            end
-            local function tabcount()
-                tabcount = 0
-                for _,wi in ipairs(s.win) do tabcount = tabcount + #wi.tab end
-                return #s.win .. "/" .. tabcount
-            end
-            local function sync()
-                return tostring(s.sync)
-            end
-            table.insert(rows, { "", name, ctime, mtime, tabcount, sync, sess = s })
-        end
+        local rows = build_sessmenu()
         w.menu:build(rows)
         w:notify("Use j/k to move, o/ENT open, d delete, r rename", false)
 
@@ -486,6 +494,7 @@ add_binds("sessionlist", lousy.util.table.join({
 -- dont tab-complete bookmarks or history on listsess
 completion.order[2] = function(state) if string.match(state.left, "^%S+sess%s") then return else return completion.funcs.history(state) end end
 completion.order[3] = function(state) if string.match(state.left, "^%S+sess%s") then return else return completion.funcs.bookmarks(state) end end
+
 table.insert(completion.order, function(state) 
         -- Find word under cursor (also checks not first word)
         local term = string.match(state.left, "%s(%S+)$")
