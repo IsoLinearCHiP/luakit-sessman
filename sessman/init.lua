@@ -28,8 +28,12 @@ local chrome = require("chrome")
 -- local sql_escape = lousy.util.sql_escape
 local add_binds = add_binds
 local add_cmds = add_cmds
+local new_mode = new_mode
+local menu_binds = menu_binds
+local completion = completion
 local capi = {
-    luakit = luakit
+    luakit = luakit,
+    timer = timer
 }
 
 require("sessman.SessData")
@@ -384,56 +388,64 @@ add_cmds({
             sessname = a or ""
             add(sessname, not o.bang)
         end),
+    cmd("listsess", function (w,a,o)
+            currwin = w
+
+            w:set_mode("sessionlist")
+        end),
 })
 
 -- FIXME: add interactive list for sessionnames
 -- Add mode to display all sessions in an interactive menu.
--- new_mode("sessionlist", {
---     enter = function (w)
---         -- Build session list
---         local rows = {{ "Name", "Created", "Modified", "Win/Tabs", "Sync", title = true }}
---         for _, s in ipairs(sessions) do
---             local function name()
---                 return "THE SESSIONNAME"
---             end
---             local function ctime()
---                 return "THE CTIME"
---             end
---             local function mtime()
---                 return "THE MTIME"
---             end
---             local function tabcount()
---                 return "THE TABCOUNT"
---             end
---             local function sync()
---                 return "THE SYNCSTATE"
---             end
---             table.insert(rows, { name, ctime, mtime, tabcount, sync, sess = s })
---         end
---         w.menu:build(rows)
---         w:notify("Use j/k to move, o/ENT open, d delete, r rename", false)
--- 
---         -- Update menu every second
---         local update_timer = capi.timer{interval=1000}
---         update_timer:add_signal("timeout", function ()
---             w.menu:update()
---         end)
---         w.session_menu_state = { update_timer = update_timer }
---         update_timer:start()
---     end,
--- 
---     leave = function (w)
---         local ds = w.session_menu_state
---         if ds and ds.update_timer.started then
---             ds.update_timer:stop()
---         end
---         w.menu:hide()
---     end,
--- })
--- 
--- -- Add additional binds to session menu mode.
+new_mode("sessionlist", {
+    enter = function (w)
+        local sessions = session.get_sessions()
+        -- Build session list
+        local rows = {{ "", "Name", "Created", "Modified", "Win/Tabs", "Sync", title = true }}
+        for _, s in ipairs(sessions) do
+            local function name()
+                return s.name
+            end
+            local function ctime()
+                return s.ctime
+            end
+            local function mtime()
+                return s.mtime
+            end
+            local function tabcount()
+                tabcount = 0
+                for _,wi in ipairs(s.win) do tabcount = tabcount + #wi.tab end
+                return #s.win .. "/" .. tabcount
+            end
+            local function sync()
+                return tostring(s.sync)
+            end
+            table.insert(rows, { "", name, ctime, mtime, tabcount, sync, sess = s })
+        end
+        w.menu:build(rows)
+        w:notify("Use j/k to move, o/ENT open, d delete, r rename", false)
+
+        -- Update menu every second
+        -- local update_timer = capi.timer{interval=1000}
+        -- update_timer:add_signal("timeout", function ()
+        --     w.menu:update()
+        -- end)
+        -- w.session_menu_state = { update_timer = update_timer }
+        -- update_timer:start()
+    end,
+
+    leave = function (w)
+        -- local ds = w.session_menu_state
+        -- if ds and ds.update_timer.started then
+        --     ds.update_timer:stop()
+        -- end
+        w.menu:hide()
+    end,
+})
+
+-- Add additional binds to session menu mode.
 -- local key = lousy.bind.key
--- add_binds("sessionlist", lousy.util.table.join({
+add_binds("sessionlist", lousy.util.table.join({
 --     -- Delete session
 --     key({}, "d", function (w)
 --         local row = w.menu:get()
@@ -458,14 +470,25 @@ add_cmds({
 --         end
 --         -- HACK: Bad way of refreshing session list to show new items
 --         -- (I.e. the new session after the rename)
---         w:set_mode("downloadlist")
+--         w:set_mode("sessionlist")
 --     end),
--- 
---     -- Exit menu
---     key({}, "q", function (w) w:set_mode() end),
--- 
--- }, menu_binds))
 
+    -- Exit menu
+    key({}, "q", function (w) w:set_mode() end),
+
+}, menu_binds))
+
+-- FIXME: add tab-completion
+-- dont tab-complete bookmarks or history on listsess
+completion.order[2] = function(state) if string.match(state.left, "^%S+sess%s") then return else return completion.funcs.history(state) end end
+completion.order[3] = function(state) if string.match(state.left, "^%S+sess%s") then return else return completion.funcs.bookmarks(state) end end
+table.insert(completion.order, function(state) 
+        -- Find word under cursor (also checks not first word)
+        local term = string.match(state.left, "%s(%S+)$")
+        if not string.match(state.left, "^%S+sess%s") or not term then return end
+
+        local sessions = session.get_sessions() 
+    end)
 
 -- FIXME: shutdown interuption if session not saved?
 -- capi.luakit.add_signal("can-close", function ()
