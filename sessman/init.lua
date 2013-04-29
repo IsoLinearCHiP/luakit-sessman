@@ -497,7 +497,7 @@ completion.order[3] = function(state) if string.match(state.left, "^%S+sess%s") 
 
 table.insert(completion.order, function(state) 
         -- Find word under cursor (also checks not first word)
-        local term = string.match(state.left, "%s(%S+)$")
+        local term = string.match(state.left, "%s(%S*)$")
         if not string.match(state.left, "^%S+sess%s") or not term then return end
 
         local sessions = session.get_sessions() 
