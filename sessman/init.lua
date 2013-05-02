@@ -403,6 +403,8 @@ add_cmds({
 -- Add mode to display all sessions in an interactive menu.
 function build_sessmenu(sessname,left)
     local sessions = session.get_sessions(sessname)
+    if not sessions then return end
+
     local left = left or ""
     -- Build session list
     local rows = {{ "", "Name", "Created", "Modified", "Win/Tabs", "Sync", title = true }}
@@ -497,11 +499,15 @@ completion.order[3] = function(state) if string.match(state.left, "^%S+sess%s") 
 
 table.insert(completion.order, function(state) 
         -- Find word under cursor (also checks not first word)
-        local term = string.match(state.left, "%s(%S*)$")
+        local term = string.match(state.left, "%s(%S+)$")
         local cmd = string.match(state.left, "^%S+sess%s")
         if not cmd or not term then return end
 
-        local rows = build_sessmenu(term, ":" .. cmd)
+        -- Strip last word (so that we can append the completion uri)
+        local left = ":" .. string.sub(state.left, 1,
+            string.find(state.left, "%s(%S+)$"))
+
+        local rows = build_sessmenu(term, left)
         return rows
     end)
 
