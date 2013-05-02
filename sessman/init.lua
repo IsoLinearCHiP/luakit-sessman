@@ -383,14 +383,16 @@ add_cmds({
     cmd("sessload", function (w,a,o)
             currwin = w
 
-            name = a
+            -- trim the string, since tab complete adds funky spaces
+            local name = a:match("^%s*(.-)%s*$")
             session.sload(w, name, not o.bang)
         end),
     cmd("sesssave", function (w,a,o)
             currwin = w
 
-            sessname = a or ""
-            add(sessname, not o.bang)
+            -- trim the string, since tab complete adds funky spaces
+            local name = a:match("^%s*(.-)%s*$") or ""
+            add(name, not o.bang)
         end),
     cmd("sesslist", function (w,a,o)
             currwin = w
