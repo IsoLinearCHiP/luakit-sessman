@@ -494,13 +494,13 @@ add_binds("sessionlist", lousy.util.table.join({
 
 -- FIXME: add tab-completion
 -- dont tab-complete bookmarks or history on listsess
-completion.order[2] = function(state) if string.match(state.left, "^%S+sess%s") then return else return completion.funcs.history(state) end end
-completion.order[3] = function(state) if string.match(state.left, "^%S+sess%s") then return else return completion.funcs.bookmarks(state) end end
+completion.order[2] = function(state) if string.match(state.left, "^sess(%S+)%s") then return else return completion.funcs.history(state) end end
+completion.order[3] = function(state) if string.match(state.left, "^sess(%S+)%s") then return else return completion.funcs.bookmarks(state) end end
 
 table.insert(completion.order, function(state) 
         -- Find word under cursor (also checks not first word)
         local term = string.match(state.left, "%s(%S+)$")
-        local cmd = string.match(state.left, "^%S+sess%s")
+        local cmd = string.match(state.left, "^sess(%S+)%s")
         if not cmd or not term then return end
 
         -- Strip last word (so that we can append the completion uri)
