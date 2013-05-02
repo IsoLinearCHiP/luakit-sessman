@@ -380,19 +380,19 @@ add_cmds({
             -- FIXME a better way to get the current window is needed
             currwin = w
         end),
-    cmd("loadsess", function (w,a,o)
+    cmd("sessload", function (w,a,o)
             currwin = w
 
             name = a
             session.sload(w, name, not o.bang)
         end),
-    cmd("savesess", function (w,a,o)
+    cmd("sesssave", function (w,a,o)
             currwin = w
 
             sessname = a or ""
             add(sessname, not o.bang)
         end),
-    cmd("listsess", function (w,a,o)
+    cmd("sesslist", function (w,a,o)
             currwin = w
 
             w:set_mode("sessionlist")
