@@ -161,6 +161,18 @@ session = {
         return age
     end,
 
+    -- Delete a session
+    delete = function (name)
+        -- FIXME: sanitize Name
+        if not lfs.attributes(session.path) then return end
+        local sfile = file(session.path,name)
+        if not os.exists(sfile) then 
+            return
+        else
+           return os.remove(sfile)
+        end
+    end,
+
     -- Set the name of the session for the window.
     setname = function (w, name, force)
         if os.exists(file(session.path,name)) and not force then return false end
