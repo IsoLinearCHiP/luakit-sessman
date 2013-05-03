@@ -107,32 +107,6 @@ session = {
     -- FIXME: Maybe the storage dir should be considdered a config rather than data
     path = basedir() .. "/luakit/sessions/",
 
-    -- Save all tabs of current window to session file (if it exists).
-    store = function (w, session_data, force)
-        -- abort if no session_data or empty name
-        if not session_data or not session_data.name then w:error('Error in Sessiondata') return false end
-
-        local name = session_data.name
-        if name then
-            -- do the saving
-            if #session_data.win > 0 then
-                res = session.write(name,session_data,force)
-                if res == "old" then
-                    w:notify("\"" .. name .. "\" written")
-                elseif res == "new" then
-                    w:notify("\"" .. name .. "\" [New] written")
-                else
-                    w:error("\"" .. name .. "\" exists in session directory (add ! to override)")
-                    return false
-                end
-            end
-        else
-            w:error("No session name")
-            return false
-        end
-        return true
-    end,
-
     -- Read urls from session file.
     read = function (name)
         local path = session.path
@@ -235,6 +209,32 @@ session = {
                 w = nil
             end
         end
+    end,
+
+    -- Save all tabs of current window to session file (if it exists).
+    store = function (w, session_data, force)
+        -- abort if no session_data or empty name
+        if not session_data or not session_data.name then w:error('Error in Sessiondata') return false end
+
+        local name = session_data.name
+        if name then
+            -- do the saving
+            if #session_data.win > 0 then
+                res = session.write(name,session_data,force)
+                if res == "old" then
+                    w:notify("\"" .. name .. "\" written")
+                elseif res == "new" then
+                    w:notify("\"" .. name .. "\" [New] written")
+                else
+                    w:error("\"" .. name .. "\" exists in session directory (add ! to override)")
+                    return false
+                end
+            end
+        else
+            w:error("No session name")
+            return false
+        end
+        return true
     end,
 
     -- load sessions from sessionpath
