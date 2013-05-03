@@ -48,8 +48,8 @@ Sessionlist Menu
 
 The sessionlist menu has a few keybindings of its own in addition to the usual menu keybindings:
 
-* ```Enter```   : Depending on whether ```:sesslist``` was used with a bang ("!"), the default action is either replace or append. See the status Line for an indication of which is the case.
-* ```S-Enter``` : Depending on whether ```:sesslist``` was used with a bang ("!"), the default action is either append or replace. See the status Line for an indication of which is the case.
+* ```Enter```   : Depending on whether ```:sessman``` was used with a bang ("!"), the default action is either replace or append. See the status Line for an indication of which is the case.
+* ```S-Enter``` : Depending on whether ```:sessman``` was used with a bang ("!"), the default action is either append or replace. See the status Line for an indication of which is the case.
 * ```o```       : Reguardless of the default action (bang or not) replaces the current session.
 * ```w```       : Reguardless of the default action (bang or not) appends to the current session.
 * ```D```       : Deletes the session. **Attention** this is a capital D to make accidental deletion unlikely.
