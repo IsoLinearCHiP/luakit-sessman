@@ -380,6 +380,9 @@ chrome_page = "luakit://sessionman/"
 -- Key Bindings
 --------------------
 
+-- window specific state is stored here
+local state = setmetatable({}, { __mode = "k" })
+
 local key, buf = lousy.bind.key, lousy.bind.buf
 add_binds("normal", {
 --     buf("^gs$", "Open session manager in the current tab.",
@@ -431,6 +434,8 @@ add_cmds({
     cmd("sesslist", function (w,a,o)
             currwin = w
 
+            if not state[w] then state[w] = {} end
+            state[w].replace = (o.bang == true)
             w:set_mode("sessionlist")
         end),
 })
@@ -473,25 +478,20 @@ new_mode("sessionlist", {
         -- Build session list
         local rows = build_sessmenu()
         w.menu:build(rows)
-        w:notify("Use j/k to move, o/ENT open, d delete, r rename", false)
+        local helpstr = "j/k to move, o open, w append, d delete"
+        helpstr = (state[w].replace and "[O] ENT open, S-ENT append, " or "[W] ENT append, S-ENT open, ") .. helpstr -- prepend the mode
+        w:notify(helpstr, false)
     end,
 
     leave = function (w)
         w.menu:hide()
+        state[w].replace = nil
     end,
 })
 
 -- Add additional binds to session menu mode.
 -- local key = lousy.bind.key
 add_binds("sessionlist", lousy.util.table.join({
---     -- Open session
---     key({}, "o", function (w)
---         local row = w.menu:get()
---         if row and row.dl then
---             -- FIXME: open the session
---         end
---     end),
--- 
     -- Delete session
     key({}, "d", "Delete a session from disk.",
         function (w)
@@ -512,6 +512,39 @@ add_binds("sessionlist", lousy.util.table.join({
 --         -- (I.e. the new session after the rename)
 --         w:set_mode("sessionlist")
 --     end),
+
+    key({}, "w", "Open a session appending to the current one.",
+        function (w)
+            local row = w.menu:get()
+            if row and row.sess then
+                session.sload(w, row.sess.name, false)
+                w:set_mode()
+            end
+        end),
+    key({}, "o", "Open a session replacing the current one.",
+        function (w)
+            local row = w.menu:get()
+            if row and row.sess then
+                session.sload(w, row.sess.name, true)
+                w:set_mode()
+            end
+        end),
+    key({}, "Return", "Open a session, maybe replacing the current one.",
+        function (w)
+            local row = w.menu:get()
+            if row and row.sess then
+                session.sload(w, row.sess.name, state[w].replace)
+                w:set_mode()
+            end
+        end),
+    key({"Shift"}, "Return", "Open a session, maybe replacing the current one.",
+        function (w)
+            local row = w.menu:get()
+            if row and row.sess then
+                session.sload(w, row.sess.name, not state[w].replace)
+                w:set_mode()
+            end
+        end),
 
     -- Exit menu
     key({}, "q", function (w) w:set_mode() end),
