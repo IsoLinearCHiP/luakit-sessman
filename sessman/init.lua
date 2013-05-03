@@ -390,9 +390,26 @@ add_binds("normal", {
 --             w:navigate(chrome_page)
 --         end),
 --
-    buf("^gS$", "Open session manager in a new tab.",
+--     buf("^gS$", "Open session manager in a new tab.",
+--         function(w)
+--             w:new_tab(chrome_page)
+--         end)
+    buf("^gs$", "Display sessions and replace by default.",
         function(w)
-            w:new_tab(chrome_page)
+            currwin = w
+
+            if not state[w] then state[w] = {} end
+            state[w].replace = true
+            w:set_mode("sessionlist")
+        end),
+
+    buf("^gS$", "Display sessions and add by default",
+        function(w)
+            currwin = w
+
+            if not state[w] then state[w] = {} end
+            state[w].replace = false
+            w:set_mode("sessionlist")
         end)
 })
 
