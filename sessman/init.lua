@@ -85,6 +85,8 @@ local function rm(file)
 end
 
 local function file(path,fname)
+    assert(string.match(fname, "^[.][.]?$") == nil, "dont try anything on '.' or '..'")
+    assert(string.find(fname, "/") == nil, "Session name may not contain '/'")
     return path .. "/" .. fname
 end
 
@@ -145,7 +147,6 @@ session = {
     -- Write tab data.
     write = function (name, sess, force)
         -- FIXME: sanitize Name
-        assert(string.find(name, "/") == nil, "Session name may not contain '/'")
         if not lfs.attributes(session.path) then lfs.mkdir(session.path) end
         local sfile = file(session.path,name) -- will save to path/name
         local age = os.exists(sfile) and "old" or "new"
