@@ -21,10 +21,7 @@ git clone git://github.com/IsoLinearCHiP/luakit-sessman.git
 ln -s `pwd`/luakit-sessman/sessman ~/.config/luakit/sessman
 ```
 
-Next edit your ```~/.config/luakit/rc.lua``` file and add ```require "sessman"``` in the "Optional user script loading" section
-
-**Attention**
-If you add it after ```require session``` the internal sessionmanagement (ZZ, :restart, etc) wont work. This is semi-intentional as this extention is meant to eventually be a drop-in replacement, however that part is not finished yet.
+Next edit your ```~/.config/luakit/rc.lua``` file and add ```require "sessman"``` in the "Optional user script loading" section. **Attention** Make sure to add it after ```require "completion"```.
 
 **Attention**
 If you changed anything about the order of the tab-completion module (or for that matter probably anything about the tab-completion) things will likely be broken, as I am doing some funky stuff with the complete module to get the tab-completion to work with the session list. I will add an option to disable interfering with the tabcomplete module at a later time.
