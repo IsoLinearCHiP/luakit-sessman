@@ -2,9 +2,6 @@
 -- @author IsoLinearCHiP <isolin.chip@gmail.com>
 ---------------------------------------------------------------------------
 
--- Grab environment we need
-local util = require("lousy.util")
-
 -- Grab what we need from the Lua environment
 local table = table
 local string = string
@@ -18,16 +15,14 @@ local assert = assert
 local setmetatable = setmetatable
 local os = os
 local error = error
-local window = window
 local tostring = tostring
 local debug = debug
-local lfs = lfs
 
 -- Grab the luakit environment we need
+local lfs = lfs
+local window = window
 local lousy = require("lousy")
 local chrome = require("chrome")
--- local markdown = require("markdown")
--- local sql_escape = lousy.util.sql_escape
 local add_binds = add_binds
 local add_cmds = add_cmds
 local new_mode = new_mode
@@ -103,9 +98,17 @@ session = {
     restore = function (delete)
     end,
 
+    ----------
+    -- OPTIONS
+    ----------
+
     -- The directory where sessions are stored
     -- FIXME: Maybe the storage dir should be considdered a config rather than data
     path = basedir() .. "/luakit/sessions/",
+
+    ----------------------
+    -- low level functions
+    ----------------------
 
     -- Read urls from session file.
     read = function (name)
@@ -147,6 +150,7 @@ session = {
         end
     end,
 
+    -- FIXME: old relic, should probably remove it soon
     -- Set the name of the session for the window.
     setname = function (w, name, force)
         if os.exists(file(session.path,name)) and not force then return false end
@@ -171,7 +175,17 @@ session = {
         end
     end,
 
+    -----------------------
+    -- high level functions
+    -----------------------
+
     -- Load new session from file; optionally replace existing session.
+    --  w : the window which is guaranteed to stay open, and which will receive notifications
+    --  name : the name of the session to be loaded (as specified in the file contents)
+    --  replace : optional, if set to true, all windows (except 'w') and tabs will be closed and
+    --            replaced by the session
+    --  @returns currently nothing
+    -- FIXME: add a usefull return status
     sload = function (w, name, replace)
         if name then
             local sess_data = session.read(name)
@@ -212,6 +226,10 @@ session = {
     end,
 
     -- Save all tabs of current window to session file (if it exists).
+    --  w : the window which will receive the notifications
+    --  session_data : a SessData object containing to be stored, most easily obtained by session.copy_curr()
+    --  force : if set to true, will overwrite any old existing session of the same (file-)name
+    --  @returns true if the session was stored successfully
     store = function (w, session_data, force)
         -- abort if no session_data or empty name
         if not session_data or not session_data.name then w:error('Error in Sessiondata') return false end
@@ -237,7 +255,9 @@ session = {
         return true
     end,
 
-    -- load sessions from sessionpath
+    -- Load sessions from sessionpath
+    --  sessname : a string which is used to filter the session name by, using string.match()
+    --  @returns a list of SessData objects
     get_sessions = function (sessname)
         local Sessions = {}
         local sessname = sessname or ""
@@ -254,6 +274,7 @@ session = {
     end,
 
     -- Copy current Session
+    --  @returns a SessData object representing the current session
     copy_curr = function()
         local self = Session:new()
         -- get all active windows
@@ -457,7 +478,6 @@ add_cmds({
         end),
 })
 
--- FIXME: add interactive list for sessionnames
 -- Add mode to display all sessions in an interactive menu.
 function build_sessmenu(sessname,left)
     local sessions = session.get_sessions(sessname)
@@ -507,7 +527,6 @@ new_mode("sessionlist", {
 })
 
 -- Add additional binds to session menu mode.
--- local key = lousy.bind.key
 add_binds("sessionlist", lousy.util.table.join({
     -- Delete session
     key({}, "d", "Delete a session from disk.",
@@ -568,7 +587,7 @@ add_binds("sessionlist", lousy.util.table.join({
 
 }, menu_binds))
 
--- FIXME: add tab-completion
+-- FIXME: make the tab-completion better
 -- dont tab-complete bookmarks or history on listsess
 completion.order[2] = function(state) if string.match(state.left, "^sess(%S+)%s") then return else return completion.funcs.history(state) end end
 completion.order[3] = function(state) if string.match(state.left, "^sess(%S+)%s") then return else return completion.funcs.bookmarks(state) end end
