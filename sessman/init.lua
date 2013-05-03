@@ -21,6 +21,7 @@ local debug = debug
 -- Grab the luakit environment we need
 local lfs = lfs
 local window = window
+local webview = webview
 local lousy = require("lousy")
 local add_binds = add_binds
 local add_cmds = add_cmds
@@ -239,10 +240,11 @@ session = {
             if #session_data.win > 0 then
                 res = session.write(name,session_data,force)
                 if res == "old" then
-                    w:notify("\"" .. name .. "\" written")
+                    if w then w:notify("\"" .. name .. "\" written") end
                 elseif res == "new" then
-                    w:notify("\"" .. name .. "\" [New] written")
+                    if w then w:notify("\"" .. name .. "\" [New] written") end
                 else
+                    assert(w, "error trying to write session. No active window to notify")
                     w:error("\"" .. name .. "\" exists in session directory (add ! to override)")
                     return false
                 end
@@ -536,6 +538,24 @@ table.insert(completion.order, function(state)
         local rows = build_sessmenu(term, left)
         return rows
     end)
+
+-- FIXME: Autosave on page load for crashrecovery
+-- Setup signals on sessman module
+lousy.signal.setup(_M, true)
+
+webview.init_funcs.sessman = function (view, w)
+    -- Add items
+    view:add_signal("load-status", function (v, status)
+        -- Don't add history items when in private browsing mode
+        if v.enable_private_browsing then return end
+
+        -- We use the "committed" status here because we are not interested in
+        -- any intermediate uri redirects taken before reaching the real uri.
+        if status == "committed" then
+            add("!LAST", true)
+        end
+    end)
+end
 
 -- FIXME: shutdown interuption if session not saved?
 -- capi.luakit.add_signal("can-close", function ()
