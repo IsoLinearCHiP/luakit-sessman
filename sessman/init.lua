@@ -476,14 +476,6 @@ new_mode("sessionlist", {
 -- Add additional binds to session menu mode.
 -- local key = lousy.bind.key
 add_binds("sessionlist", lousy.util.table.join({
---     -- Delete session
---     key({}, "d", function (w)
---         local row = w.menu:get()
---         if row and row.dl then
---             -- FIXME: delete the session
---         end
---     end),
--- 
 --     -- Open session
 --     key({}, "o", function (w)
 --         local row = w.menu:get()
@@ -492,6 +484,16 @@ add_binds("sessionlist", lousy.util.table.join({
 --         end
 --     end),
 -- 
+    -- Delete session
+    key({}, "d", "Delete a session from disk.",
+        function (w)
+            local row = w.menu:get()
+            if row and row.sess then
+                session.delete(row.sess.name)
+                w:set_mode("sessionlist")
+            end
+        end),
+
 --     -- Rename session
 --     key({}, "r", function (w)
 --         local row = w.menu:get()
