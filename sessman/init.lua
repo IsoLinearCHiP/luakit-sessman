@@ -146,7 +146,7 @@ session = {
     write = function (name, sess, force)
         -- FIXME: sanitize Name
         assert(string.find(name, "/") == nil, "Session name may not contain '/'")
-        -- FIXME: create sessiondir if not existant
+        if not lfs.attributes(session.path) then lfs.mkdir(session.path) end
         local sfile = file(session.path,name) -- will save to path/name
         local age = os.exists(sfile) and "old" or "new"
         if age == "old" and not force then return false end
@@ -179,20 +179,19 @@ session = {
                     -- FIXME actually store sess to file
 
                     -- clear tabs from current window
-                    -- FIXME get the length properly # is bogus
-                    local numwin = #window.bywidget + 1
-                    for _,w in pairs(window.bywidget) do 
-                        if numwin > 1 then
-                            w:close()
-                            numwin = numwin - 1
+                    for _,wtemp in pairs(window.bywidget) do 
+                        if wtemp ~= w then
+                            wtemp:close_win()
                         else
-                            while w.tabs:count() ~= 1 do
-                                w:close_tab(nil, true)
+                            while wtemp.tabs:count() ~= 1 do
+                                wtemp:close_tab(nil, false)
                             end
                         end
                     end
+                    session.open(w,sess_data)
+                else
+                    session.open(nil,sess_data)
                 end
-                session.open(w,sess_data)
                 if replace then
                     session.setname(w,name,true)
                 end
@@ -211,13 +210,16 @@ session = {
 
     -- Open new tabs from table of tab data.
     open = function (w,sess_data)
-        -- local w = w
-        if sess_data and w then -- load new tabs
+        local w = w
+        if sess_data then -- load new tabs
             for wi, win in pairs(sess_data.win) do
+                w = w or window.new({"luakit://sessionman/"})
+                w:close_tab(nil, false)
                 for ti, tab in pairs(win.tab) do
                     -- print("loading tab with:" .. tab.uri .. tostring(tab.hist))
                     w:new_tab(tab.hist)
                 end
+                w = nil
             end
         end
     end,
