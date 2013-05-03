@@ -420,6 +420,14 @@ add_cmds({
             local name = a:match("^%s*(.-)%s*$") or ""
             add(name, o.bang)
         end),
+    cmd("sessremove", function (w,a,o)
+            currwin = w
+
+            -- trim the string, since tab complete adds funky spaces
+            local name = a:match("^%s*(.-)%s*$") or ""
+            -- FIXME: add some userfeedback
+            session.delete(name)
+        end),
     cmd("sesslist", function (w,a,o)
             currwin = w
 
