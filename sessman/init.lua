@@ -22,7 +22,6 @@ local debug = debug
 local lfs = lfs
 local window = window
 local lousy = require("lousy")
-local chrome = require("chrome")
 local add_binds = add_binds
 local add_cmds = add_cmds
 local new_mode = new_mode
@@ -308,12 +307,12 @@ session = {
 -- JS interface functions
 -------------------------
 
-function get()
-    local Sessions = session.get_sessions()
-    table.insert(Sessions, 1, session.copy_curr())
-
-    return Sessions
-end
+-- function get()
+--     local Sessions = session.get_sessions()
+--     table.insert(Sessions, 1, session.copy_curr())
+-- 
+--     return Sessions
+-- end
 
 function add(sessname, overwrite)
     w = currwin
@@ -325,13 +324,13 @@ function add(sessname, overwrite)
     return session.store(w, sess,overwrite or false)
 end
 
-function loads(sessname)
-    w = currwin
-    -- FIXME: error handling when sessname not set
-    if not sessname then w:error('No Sessionname specified.') return false end
-
-    return session.sload(w, sessname,false)
-end
+-- function loads(sessname)
+--     w = currwin
+--     -- FIXME: error handling when sessname not set
+--     if not sessname then w:error('No Sessionname specified.') return false end
+-- 
+--     return session.sload(w, sessname,false)
+-- end
 
 export_funcs = {
     sessionman_add    = _M.add,
@@ -340,62 +339,6 @@ export_funcs = {
     -- FIXME: implement a delete session operation
     -- sessionman_remove = remove,
 }
-
------------------------------
--- add chrome interface items
------------------------------
-
-stylesheet = [===[
-// this space intentionally left blank
-]===]
-
-local html = lousy.load(getcwd() .. "sessman.html")
-
-local main_js = lousy.load(getcwd() .. "sessman.js")
-
-chrome.add("sessionman", function (view, meta)
-    local uri = "luakit://sessionman/"
-
-    -- local style = chrome.stylesheet .. _M.stylesheet
-    local style = ""
-
-    local html = string.gsub(html, "{%%(%w+)}", { stylesheet = style })
-
-    view:load_string(html, uri)
-
-    function on_first_visual(_, status)
-        -- Wait for new page to be created
-        if status ~= "first-visual" then return end
-
-        -- Hack to run-once
-        view:remove_signal("load-status", on_first_visual)
-
-        -- Double check that we are where we should be
-        if view.uri ~= uri then return end
-
-        -- Export luakit JS<->Lua API functions
-        for name, func in pairs(export_funcs) do
-            view:register_function(name, func)
-        end
-
-        view:register_function("reset_mode", function ()
-            meta.w:set_mode() -- HACK to unfocus search box
-        end)
-
-        -- Load jQuery JavaScript library
-        local jquery = lousy.load("lib/jquery.min.js")
-        local _, err = view:eval_js(jquery, { no_return = true })
-        assert(not err, err)
-
-        -- Load main luakit://sessionman/ JavaScript
-        local _, err = view:eval_js(main_js, { no_return = true })
-        assert(not err, err)
-    end
-
-    view:add_signal("load-status", on_first_visual)
-end)
-
-chrome_page = "luakit://sessionman/"
 
 --------------------
 -- Key Bindings
@@ -406,15 +349,6 @@ local state = setmetatable({}, { __mode = "k" })
 
 local key, buf = lousy.bind.key, lousy.bind.buf
 add_binds("normal", {
---     buf("^gs$", "Open session manager in the current tab.",
---         function(w)
---             w:navigate(chrome_page)
---         end),
---
---     buf("^gS$", "Open session manager in a new tab.",
---         function(w)
---             w:new_tab(chrome_page)
---         end)
     buf("^gs$", "Display sessions and replace by default.",
         function(w)
             currwin = w
@@ -442,10 +376,12 @@ currwin = nil
 
 local cmd = lousy.bind.cmd
 add_cmds({
-    cmd("sessionman", function (w)
-            w:new_tab(chrome_page)
-            -- FIXME a better way to get the current window is needed
+    cmd("sessman", function (w,a,o)
             currwin = w
+
+            if not state[w] then state[w] = {} end
+            state[w].replace = (o.bang == true)
+            w:set_mode("sessionlist")
         end),
     cmd("sessload", function (w,a,o)
             currwin = w
@@ -468,13 +404,6 @@ add_cmds({
             local name = a:match("^%s*(.-)%s*$") or ""
             -- FIXME: add some userfeedback
             session.delete(name)
-        end),
-    cmd("sesslist", function (w,a,o)
-            currwin = w
-
-            if not state[w] then state[w] = {} end
-            state[w].replace = (o.bang == true)
-            w:set_mode("sessionlist")
         end),
 })
 
