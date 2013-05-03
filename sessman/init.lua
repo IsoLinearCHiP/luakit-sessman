@@ -155,6 +155,22 @@ session = {
         return true
     end,
 
+    -- Open new tabs from table of tab data.
+    open = function (w,sess_data)
+        local w = w
+        if sess_data then -- load new tabs
+            for wi, win in pairs(sess_data.win) do
+                w = w or window.new({"luakit://sessionman/"})
+                w:close_tab(nil, false)
+                for ti, tab in pairs(win.tab) do
+                    -- print("loading tab with:" .. tab.uri .. tostring(tab.hist))
+                    w:new_tab(tab.hist)
+                end
+                w = nil
+            end
+        end
+    end,
+
     -- Load new session from file; optionally replace existing session.
     sload = function (w, name, replace)
         if name then
@@ -192,22 +208,6 @@ session = {
             end
         else
             w:error("No session name")
-        end
-    end,
-
-    -- Open new tabs from table of tab data.
-    open = function (w,sess_data)
-        local w = w
-        if sess_data then -- load new tabs
-            for wi, win in pairs(sess_data.win) do
-                w = w or window.new({"luakit://sessionman/"})
-                w:close_tab(nil, false)
-                for ti, tab in pairs(win.tab) do
-                    -- print("loading tab with:" .. tab.uri .. tostring(tab.hist))
-                    w:new_tab(tab.hist)
-                end
-                w = nil
-            end
         end
     end,
 
