@@ -485,7 +485,8 @@ function build_sessmenu(sessname,left)
 
     local left = left or ""
     -- Build session list
-    local rows = {{ "", "Name", "Created", "Modified", "Win/Tabs", "Sync", title = true }}
+    -- local rows = {{ "Name", "Created", "Modified", "Win/Tabs", "Sync", title = true }}
+    local rows = {{ "Name", "Created", "Win/Tabs", title = true }}
     for _, s in ipairs(sessions) do
         local function name()
             return s.name
@@ -504,7 +505,8 @@ function build_sessmenu(sessname,left)
         local function sync()
             return tostring(s.sync)
         end
-        table.insert(rows, { "", name, ctime, mtime, tabcount, sync, sess = s, left = left .. name() })
+        -- table.insert(rows, { name, ctime, mtime, tabcount, sync, sess = s, left = left .. name() })
+        table.insert(rows, { name, ctime, tabcount, sess = s, left = left .. name() })
     end
     
     return rows
