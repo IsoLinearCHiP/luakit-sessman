@@ -57,7 +57,7 @@ The sessionlist menu has a few keybindings of its own in addition to the usual m
 Commands
 --------
 
-Use ```:sessman``` to open the sessionlist menu. If a bang ("!") is added to the command, the default behaviour of Enter is changed from replace to append.
+Use ```:sessman``` to open the sessionlist menu. If a bang ("!") is added to the command, the default behaviour of Enter is changed from append to replace.
 
 Use ```:sesssave [name]``` to save the current session under the given name (if you dont provide a name, "autosave" and a datetime will be used). In order to replace an existing session you need to add a bang ("!") to the command.
 
