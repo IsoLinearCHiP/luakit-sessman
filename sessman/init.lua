@@ -531,7 +531,7 @@ new_mode("sessionlist", {
 -- Add additional binds to session menu mode.
 add_binds("sessionlist", lousy.util.table.join({
     -- Delete session
-    key({}, "d", "Delete a session from disk.",
+    key({}, "D", "Delete a session from disk.",
         function (w)
             local row = w.menu:get()
             if row and row.sess then
