@@ -9,7 +9,9 @@ local util = require("lousy.util")
 local table = table
 local string = string
 local io = io
-local print = print
+local type = type
+local realprint = print
+local unpack = unpack
 local pairs = pairs
 local ipairs = ipairs
 local assert = assert
@@ -60,6 +62,15 @@ end
 
 function basedir() 
     return os.getenv("XDG_DATA_HOME") or os.getenv("HOME") .. "/.local/share"
+end
+
+function print(...)
+    for k,v in pairs(arg) do
+        if type(v) ~= "string" then
+            arg[k] = tostring(v)
+        end
+    end
+    realprint(unpack(arg))
 end
 
 
