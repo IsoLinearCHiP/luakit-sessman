@@ -230,7 +230,7 @@ session = {
         local sessname = sessname or ""
         for sessfile in lfs.dir(session.path) do
             if not ( sessfile == "." or sessfile == ".." ) then
-                sess = session.read(sessfile)
+                local sess = session.read(sessfile)
                 if string.match(sess.name, sessname) then 
                     table.insert(Sessions, sess)
                 end
@@ -453,21 +453,9 @@ new_mode("sessionlist", {
         local rows = build_sessmenu()
         w.menu:build(rows)
         w:notify("Use j/k to move, o/ENT open, d delete, r rename", false)
-
-        -- Update menu every second
-        -- local update_timer = capi.timer{interval=1000}
-        -- update_timer:add_signal("timeout", function ()
-        --     w.menu:update()
-        -- end)
-        -- w.session_menu_state = { update_timer = update_timer }
-        -- update_timer:start()
     end,
 
     leave = function (w)
-        -- local ds = w.session_menu_state
-        -- if ds and ds.update_timer.started then
-        --     ds.update_timer:stop()
-        -- end
         w.menu:hide()
     end,
 })
