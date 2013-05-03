@@ -387,14 +387,14 @@ add_cmds({
             currwin = w
 
             -- trim the string, since tab complete adds funky spaces
-            local name = a:match("^%s*(.-)%s*$")
+            local name = a and a:match("^%s*(.-)%s*$") or nil
             session.sload(w, name, o.bang)
         end),
     cmd("sesssave", function (w,a,o)
             currwin = w
 
             -- trim the string, since tab complete adds funky spaces
-            local name = a:match("^%s*(.-)%s*$") or ""
+            local name = a and a:match("^%s*(.-)%s*$") or ""
             add(name, o.bang)
         end),
     cmd("sessremove", function (w,a,o)
