@@ -27,21 +27,21 @@ Next edit your ```~/.config/luakit/rc.lua``` file and add ```require "sessman"``
 If you add it after ```require session``` the internal sessionmanagement (ZZ, :restart, etc) wont work. This is semi-intentional as this extention is meant to eventually be a drop-in replacement, however that part is not finished yet.
 
 **Attention**
-If you changed anything about the order of the tab-completion module (or for that matter probably anything about the tab-completion) things will likely be broken, as I am doing some funky stuff with the complete module, to get the tab-completion to work with the session list. I will add an option to disable interfering with the tabcomplete module at a later time.
+If you changed anything about the order of the tab-completion module (or for that matter probably anything about the tab-completion) things will likely be broken, as I am doing some funky stuff with the complete module to get the tab-completion to work with the session list. I will add an option to disable interfering with the tabcomplete module at a later time.
 
 
 Usage
 =====
 
 By default there are two keybindings added:
-* ```gs``` : Opens the sessionmenu - with enter defaulting to replace current session
-* ```gS``` : Opens the sessionmenu - with enter defaulting to append to current session
+* ```gs``` : Opens the sessionmenu - with enter defaulting to replace current session.
+* ```gS``` : Opens the sessionmenu - with enter defaulting to append to current session.
 
 By default there are four commands added:
-* ```:sessman```        : Opens the sessionlist menu
-* ```:sesssave [name]``` : Saves the current session to under a given name
-* ```:sessload name```   : Loads the session of the given name
-* ```:sessremove name``` : Deletes the session with the given name
+* ```:sessman```         : Opens the sessionlist menu.
+* ```:sesssave [name]``` : Saves the current session under a given name.
+* ```:sessload name```   : Loads the session of the given name.
+* ```:sessremove name``` : Deletes the session with the given name.
 
 Sessionlist Menu
 ----------------
@@ -72,5 +72,5 @@ Attributions:
 =============
 * sess_saver.lua : http://sprunge.us/KYDc, from user joggle in #luakit
 * json.lua : https://github.com/craigmj/json4lua/raw/master/json4lua/json/json.lua
-* luaunit: https://github.com/luaforge/luaunit/blob/master/luaunit.lua
+* luaunit : https://github.com/luaforge/luaunit/blob/master/luaunit.lua
 * last but certainly not least, luakit itself, most of the interface code is refactored from existing modules, like downloads, tabcomplete, binds, proxy, etc.
