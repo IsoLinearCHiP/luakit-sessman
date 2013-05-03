@@ -38,7 +38,7 @@ By default there are two keybindings added:
 * ```gS``` : Opens the sessionmenu - with enter defaulting to append to current session
 
 By default there are four commands added:
-* ```:sesslist```        : Opens the sessionlist menu
+* ```:sessman```        : Opens the sessionlist menu
 * ```:sesssave [name]``` : Saves the current session to under a given name
 * ```:sessload name```   : Loads the session of the given name
 * ```:sessremove name``` : Deletes the session with the given name
@@ -57,7 +57,7 @@ The sessionlist menu has a few keybindings of its own in addition to the usual m
 Commands
 --------
 
-Use ```:sesslist``` to open the sessionlist menu. If a bang ("!") is added to the command, the default behaviour of Enter is changed from replace to append.
+Use ```:sessman``` to open the sessionlist menu. If a bang ("!") is added to the command, the default behaviour of Enter is changed from replace to append.
 
 Use ```:sesssave [name]``` to save the current session under the given name (if you dont provide a name, "autosave" and a datetime will be used). In order to replace an existing session you need to add a bang ("!") to the command.
 
