@@ -44,7 +44,6 @@ local Tab = sessman.SessData.Tab
 -- Advanced sessionmanager inspired by SessionManager Extension to Firefox
 module("sessionman")
 
-
 --------------------
 -- utility functions
 --------------------
@@ -68,6 +67,15 @@ function print(...)
     realprint(unpack(arg))
 end
 
+--------------------
+-- Module Globals
+--------------------
+
+-- window specific state is stored here
+local state = setmetatable({}, { __mode = "k" })
+print 'setup state'
+state.loading = false
+state.saving = false
 
 ----------------------------------------
 -- session loading and storing functions
@@ -187,7 +195,9 @@ session = {
     --  @returns currently nothing
     -- FIXME: add a usefull return status
     sload = function (w, name, replace)
+        if state.loading then return end
         if name then
+            state.loading = true
             local sess_data = session.read(name)
             if sess_data then
                 if replace then
@@ -220,6 +230,7 @@ session = {
             else
                 w:error("\"" .. name .. "\" does not exist")
             end
+            state.loading = false
         else
             w:error("No session name")
         end
@@ -233,9 +244,11 @@ session = {
     store = function (w, session_data, force)
         -- abort if no session_data or empty name
         if not session_data or not session_data.name then w:error('Error in Sessiondata') return false end
+        if state.saving then return end
 
         local name = session_data.name
         if name then
+            state.saving = true
             -- do the saving
             if #session_data.win > 0 then
                 res = session.write(name,session_data,force)
@@ -246,13 +259,16 @@ session = {
                 else
                     assert(w, "error trying to write session. No active window to notify")
                     w:error("\"" .. name .. "\" exists in session directory (add ! to override)")
+                    state.saving = false
                     return false
                 end
             end
         else
             w:error("No session name")
+            state.saving = false
             return false
         end
+        state.saving = false
         return true
     end,
 
@@ -345,9 +361,6 @@ export_funcs = {
 --------------------
 -- Key Bindings
 --------------------
-
--- window specific state is stored here
-local state = setmetatable({}, { __mode = "k" })
 
 local key, buf = lousy.bind.key, lousy.bind.buf
 add_binds("normal", {
@@ -546,6 +559,9 @@ lousy.signal.setup(_M, true)
 webview.init_funcs.sessman = function (view, w)
     -- Add items
     view:add_signal("load-status", function (v, status)
+        -- FIXME: Need to disable saving while loading a session to avoid race conditions
+        if state.loading then return end
+
         -- Don't add history items when in private browsing mode
         if v.enable_private_browsing then return end
 
