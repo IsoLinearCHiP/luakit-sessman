@@ -28,10 +28,12 @@ local add_cmds = add_cmds
 local new_mode = new_mode
 local menu_binds = menu_binds
 local completion = completion
+local luakit_session = session -- get default session manager FIXME: eventually override it
 local capi = {
     luakit = luakit,
     timer = timer
 }
+local uris = uris
 
 require("sessman.SessData")
 local Session = sessman.SessData.Session
@@ -72,9 +74,9 @@ end
 --------------------
 
 -- window specific state is stored here
-local state = setmetatable({}, { __mode = "k" })
+state = setmetatable({}, { __mode = "k" })
 print 'setup state'
-state.loading = false
+state.loading = true -- during startup set to loading so !LAST isnt overwritten
 state.saving = false
 
 ----------------------------------------
@@ -556,6 +558,20 @@ table.insert(completion.order, function(state)
 -- Setup signals on sessman module
 lousy.signal.setup(_M, true)
 
+local old_close = window.methods.close_tab
+window.methods.close_tab = function (w, view, blank_last)
+    w:emit_signal("close-tab")
+    print('closing tab')
+    old_close(w, view, blank_last)
+end
+
+local old_session_restore = session.restore
+luakit_session.restore = function (delete)
+    print 'reached restore'
+    old_session_restore(delete)
+    -- state.loading = false
+end
+
 webview.init_funcs.sessman = function (view, w)
     -- Add items
     view:add_signal("load-status", function (v, status)
@@ -568,9 +584,29 @@ webview.init_funcs.sessman = function (view, w)
         -- We use the "committed" status here because we are not interested in
         -- any intermediate uri redirects taken before reaching the real uri.
         if status == "committed" then
-            add("!LAST", true)
+            add("!CURRENT", true)
         end
     end)
+    -- view:add_signal("close-web-view", function (v, status)
+    w:add_signal("close-tab", function (v, status)
+        -- FIXME: Need to disable saving while loading a session to avoid race conditions
+        if state.loading then return end
+
+        -- Don't add history items when in private browsing mode
+        if v.enable_private_browsing then return end
+
+        add("!CURRENT", true)
+    end)
+    w:add_signal("close", function (v, status)
+        -- FIXME: Need to disable saving while loading a session to avoid race conditions
+
+        -- Don't add history items when in private browsing mode
+        if v.enable_private_browsing then return end
+
+        add("!LAST", true)
+        session.remove("!CURRENT")
+    end)
+    
 end
 
 -- FIXME: shutdown interuption if session not saved?
