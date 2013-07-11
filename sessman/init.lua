@@ -75,8 +75,7 @@ end
 
 -- window specific state is stored here
 state = setmetatable({}, { __mode = "k" })
-print 'setup state'
-state.loading = true -- during startup set to loading so !LAST isnt overwritten
+state.loading = true -- during startup set to loading so !CURRENT isnt overwritten
 state.saving = false
 
 ----------------------------------------
@@ -567,9 +566,16 @@ end
 
 local old_session_restore = session.restore
 luakit_session.restore = function (delete)
-    print 'reached restore'
-    old_session_restore(delete)
-    -- state.loading = false
+    local sess = session.read("!CURRENT") 
+    if sess then
+        print('session restore found a crashed session')
+        -- FIXME: optinally only prompt to reload crashed session
+        session.sload(nil, "!CURRENT") -- FIXME: need to get current window somehow
+    else
+        old_session_restore(delete)
+    end
+
+    state.loading = false -- at this point we are done loading in any case
 end
 
 webview.init_funcs.sessman = function (view, w)
