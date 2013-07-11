@@ -560,9 +560,9 @@ lousy.signal.setup(_M, true)
 
 local old_close = window.methods.close_tab
 window.methods.close_tab = function (w, view, blank_last)
-    w:emit_signal("close-tab")
     print('closing tab')
     old_close(w, view, blank_last)
+    w:emit_signal("close-tab")
 end
 
 local old_session_restore = session.restore
