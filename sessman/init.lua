@@ -159,6 +159,27 @@ session = {
         end
     end,
 
+    -- rename a session
+    rename = function (oldname, newname, force)
+        -- FIXME: sanitize Name
+        print('renaming session', oldname, newname)
+        if not lfs.attributes(session.path) then return false end
+        local sfile = file(session.path,oldname)
+        if not os.exists(sfile) then 
+            print('couldnt rename session, read failed')
+            return false
+        else
+            local sess = session.read(oldname)
+            sess.name = newname
+            if session.write(newname, sess, force) then
+                return os.remove(file(session.path, oldname))
+            else
+                print('couldnt rename session, write failed')
+                return false 
+            end
+        end
+    end,
+
     -- FIXME: old relic, should probably remove it soon
     -- Set the name of the session for the window.
     setname = function (w, name, force)
@@ -609,8 +630,11 @@ webview.init_funcs.sessman = function (view, w)
         -- Don't add history items when in private browsing mode
         if v.enable_private_browsing then return end
 
-        add("!LAST", true)
-        session.remove("!CURRENT")
+        state.loading = true -- lock changes
+
+        -- add("!LAST", true)
+        -- session.remove("!CURRENT")
+        local result = session.rename("!CURRENT", "!LAST", true)
     end)
     
 end
