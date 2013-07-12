@@ -330,12 +330,14 @@ session = {
 
         -- iterate over windows and add tabs to self
         for wi, w in ipairs(wins) do
-            local current = w.tabs:current()
-            self.win[wi] = Window:new()
-            self.win[wi].currtab = current
-            self.win[wi].tab = Tabs:new()
-            for ti, tab in ipairs(w.tabs.children) do
-                self.win[wi].tab[ti] = Tab:new({uri= tab.uri, title=tab.title, hist=tab.history})
+            if #w.tabs.children > 0 then
+                local current = w.tabs:current()
+                self.win[wi] = Window:new()
+                self.win[wi].currtab = current
+                self.win[wi].tab = Tabs:new()
+                for ti, tab in ipairs(w.tabs.children) do
+                    self.win[wi].tab[ti] = Tab:new({uri= tab.uri, title=tab.title, hist=tab.history})
+                end
             end
         end
         return self
@@ -630,11 +632,17 @@ webview.init_funcs.sessman = function (view, w)
         -- Don't add history items when in private browsing mode
         if v.enable_private_browsing then return end
 
-        state.loading = true -- lock changes
-
         -- add("!LAST", true)
         -- session.remove("!CURRENT")
-        local result = session.rename("!CURRENT", "!LAST", true)
+        if #window.bywidget > 1 then
+            add("!CURRENT", true)
+        else
+            state.loading = true -- lock changes
+
+            local result = session.rename("!CURRENT", "!LAST", true)
+
+            state.loading = false -- reallow changes
+        end
     end)
     
 end
