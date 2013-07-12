@@ -30,7 +30,7 @@ function dir(obj,level)
             end
             s = s .. k_str .. ' = ' .. dir(v,level .. level) .. ', '
         end
-        s = string.sub(s, 1, -3)
+        s = (#s > 1) and string.sub(s, 1, -3) or s
         s = s .. '}'
     end
     
