@@ -627,14 +627,15 @@ webview.init_funcs.sessman = function (view, w)
         add("!CURRENT", true)
     end)
     w:add_signal("close", function (v, status)
-        -- FIXME: Need to disable saving while loading a session to avoid race conditions
+        local numwins = 0
+        for tmp in pairs(window.bywidget) do numwins = numwins + 1 end
 
         -- Don't add history items when in private browsing mode
         if v.enable_private_browsing then return end
 
         -- add("!LAST", true)
         -- session.remove("!CURRENT")
-        if #window.bywidget > 1 then
+        if numwins > 1 then
             add("!CURRENT", true)
         else
             state.loading = true -- lock changes
