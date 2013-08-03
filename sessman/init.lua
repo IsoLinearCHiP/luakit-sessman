@@ -191,18 +191,23 @@ session = {
 
     -- Open new tabs from table of tab data.
     open = function (w,sess_data)
-        local w = w
+        local lastwin = nil
         if sess_data then -- load new tabs
-            for wi, win in pairs(sess_data.win) do
-                w = w or window.new({"luakit://sessionman/"})
-                w:close_tab(nil, false)
-                for ti, tab in pairs(win.tab) do
-                    -- print("loading tab with:" .. tab.uri .. tostring(tab.hist))
-                    w:new_tab(tab.hist)
+            do
+                local w = w
+                for wi, win in pairs(sess_data.win) do
+                    w = w or window.new({"luakit://sessionman/"})
+                    w:close_tab(nil, false)
+                    for ti, tab in pairs(win.tab) do
+                        -- print("loading tab with:" .. tab.uri .. tostring(tab.hist))
+                        w:new_tab(tab.hist)
+                    end
+                    lastwin = w
+                    w = nil
                 end
-                w = nil
             end
         end
+        return w or lastwin
     end,
 
     -----------------------
@@ -237,12 +242,9 @@ session = {
                             end
                         end
                     end
-                    session.open(w,sess_data)
+                    w = session.open(w,sess_data)
                 else
-                    session.open(nil,sess_data)
-                end
-                if replace then
-                    session.setname(w,name,true)
+                    w = session.open(nil,sess_data)
                 end
                 if replace then
                     w:notify("\"" .. name .. "\" loaded")
@@ -589,16 +591,30 @@ end
 
 local old_session_restore = session.restore
 luakit_session.restore = function (delete)
+    local ret
     local sess = session.read("!CURRENT") 
     if sess then
         print('session restore found a crashed session')
-        -- FIXME: optinally only prompt to reload crashed session
-        session.sload(nil, "!CURRENT") -- FIXME: need to get current window somehow
+        -- FIXME: optionally only prompt to reload crashed session
+        session.sload(nil, "!CURRENT", true) -- FIXME: need to get current window somehow
+
+        -- FIXME return a wrapper object to create a new window for loading tabs from CLI in new window
+        -- doh, or actually just return nil and let the rc file handle that
+        -- FIXME might want to doublecheck this works as expected
+        ret = { _w = nil, new_tab = function(w, uri, currtab) 
+            if not w._w then
+                w._w = window.new({uri})
+                return w._w.tabs[1]
+            else
+                return w._w:new_tab(uri, currtab)
+            end
+        end}
     else
-        old_session_restore(delete)
+        ret = old_session_restore(delete)
     end
 
     state.loading = false -- at this point we are done loading in any case
+    return ret
 end
 
 webview.init_funcs.sessman = function (view, w)
