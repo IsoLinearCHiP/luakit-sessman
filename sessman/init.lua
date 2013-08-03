@@ -222,7 +222,7 @@ session = {
     --  @returns currently nothing
     -- FIXME: add a usefull return status
     sload = function (w, name, replace)
-        if state.loading then return end
+        -- if state.loading then return end
         if name then
             state.loading = true
             local sess_data = session.read(name)
